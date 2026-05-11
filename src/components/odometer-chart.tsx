@@ -1,4 +1,13 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 
 const BIKE_COLORS = ['#2563eb', '#16a34a', '#dc2626', '#9333ea', '#ea580c']
@@ -15,7 +24,15 @@ interface Props {
   total: number | null
 }
 
-export function OdometerChart({ chartData, enabledIds, uniqueBikeIds, bikeName, hasMore, loadedCount, total }: Props) {
+export function OdometerChart({
+  chartData,
+  enabledIds,
+  uniqueBikeIds,
+  bikeName,
+  hasMore,
+  loadedCount,
+  total,
+}: Props) {
   if (chartData.length === 0) return null
 
   return (

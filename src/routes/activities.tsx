@@ -19,7 +19,11 @@ export const Route = createFileRoute('/activities')({
 })
 
 function fmtShortDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: '2-digit' })
+  return new Date(iso).toLocaleDateString(undefined, {
+    day: '2-digit',
+    month: 'short',
+    year: '2-digit',
+  })
 }
 
 type ChartEntry = { date: string } & Record<string, string | number>
@@ -36,7 +40,10 @@ function buildChartData(activities: ActivitySummary[], enabledIds: Set<string>):
   }
   return [...byDate.entries()]
     .sort(([, a], [, b]) => a._ts - b._ts)
-    .map(([date, vals]) => { const { _ts, ...rest } = vals; return { date, ...rest } })
+    .map(([date, vals]) => {
+      const { _ts, ...rest } = vals
+      return { date, ...rest }
+    })
 }
 
 export default function ActivitiesPage() {
@@ -68,31 +75,36 @@ export default function ActivitiesPage() {
   const initialized = !!activitiesData
   const loading = isLoading || (isFetching && !isFetchingNextPage)
   const loadingMore = isFetchingNextPage
-  const error = activitiesError instanceof Error ? activitiesError.message : activitiesError ? 'Unknown error' : null
+  const error =
+    activitiesError instanceof Error
+      ? activitiesError.message
+      : activitiesError
+        ? 'Unknown error'
+        : null
   const hasMore = !!hasNextPage
 
   useEffect(() => {
     if (!activitiesData) return
-    const ids = activitiesData.pages.flatMap((page) =>
-      page.activitySummaries?.map((a) => a.bikeId) ?? []
+    const ids = activitiesData.pages.flatMap(
+      (page) => page.activitySummaries?.map((a) => a.bikeId) ?? []
     )
     enableAll(ids)
   }, [activitiesData, enableAll])
 
-  const uniqueBikeIds = useMemo(
-    () => [...new Set(activities.map((a) => a.bikeId))],
-    [activities]
-  )
+  const uniqueBikeIds = useMemo(() => [...new Set(activities.map((a) => a.bikeId))], [activities])
 
   const filteredActivities = useMemo(
     () => activities.filter((a) => enabledBikeIds.has(a.bikeId)),
     [activities, enabledBikeIds]
   )
 
-  const bikeName = useCallback((bikeId: string) => {
-    const bike = bikes.find((b) => b.id === bikeId)
-    return bike ? (bike.driveUnit.productName ?? bikeId.slice(0, 8)) : bikeId.slice(0, 8)
-  }, [bikes])
+  const bikeName = useCallback(
+    (bikeId: string) => {
+      const bike = bikes.find((b) => b.id === bikeId)
+      return bike ? (bike.driveUnit.productName ?? bikeId.slice(0, 8)) : bikeId.slice(0, 8)
+    },
+    [bikes]
+  )
 
   const enabledIds = useMemo(
     () => uniqueBikeIds.filter((id) => enabledBikeIds.has(id)),
@@ -109,9 +121,12 @@ export default function ActivitiesPage() {
     [activities, activityId]
   )
 
-  const openActivity = useCallback((id: string) => {
-    navigate({ search: { activityId: id } })
-  }, [navigate])
+  const openActivity = useCallback(
+    (id: string) => {
+      navigate({ search: { activityId: id } })
+    },
+    [navigate]
+  )
 
   const closeActivity = useCallback(() => {
     navigate({ search: { activityId: undefined } })
@@ -119,7 +134,7 @@ export default function ActivitiesPage() {
 
   if (!tokenSet) {
     return (
-      <div className="p-8 flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-4 p-8">
         <p className="text-gray-600">Sign in to view activities.</p>
         <Button onClick={login}>Sign in with Bosch</Button>
       </div>
@@ -128,7 +143,7 @@ export default function ActivitiesPage() {
 
   return (
     <>
-      <div className="p-8 max-w-5xl mx-auto space-y-8">
+      <div className="mx-auto max-w-5xl space-y-8 p-8">
         <ActivitiesHeader
           uniqueBikeIds={uniqueBikeIds}
           bikeName={bikeName}
@@ -144,7 +159,7 @@ export default function ActivitiesPage() {
         />
 
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-700">{error}</div>
+          <div className="rounded-md border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
         )}
 
         <OdometerChart
@@ -168,12 +183,7 @@ export default function ActivitiesPage() {
         )}
       </div>
 
-      {tokenSet && (
-        <ActivityDetailDrawer
-          summary={selectedActivity}
-          onClose={closeActivity}
-        />
-      )}
+      {tokenSet && <ActivityDetailDrawer summary={selectedActivity} onClose={closeActivity} />}
     </>
   )
 }

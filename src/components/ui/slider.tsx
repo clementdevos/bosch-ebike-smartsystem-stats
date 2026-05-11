@@ -23,7 +23,12 @@ function Slider({
     if (isControlled) setLocalValue(value)
   }, [value, isControlled])
 
-  React.useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current) }, [])
+  React.useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    },
+    []
+  )
 
   function handleChange(next: number[]) {
     if (isControlled) setLocalValue(next)
@@ -36,16 +41,16 @@ function Slider({
       value={isControlled ? localValue : undefined}
       defaultValue={defaultValue}
       onValueChange={handleChange}
-      className={cn('relative flex w-full touch-none select-none items-center', className)}
+      className={cn('relative flex w-full touch-none items-center select-none', className)}
       {...props}
     >
-      <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
-        <SliderPrimitive.Range className="absolute h-full bg-primary" />
+      <SliderPrimitive.Track className="bg-primary/20 relative h-1.5 w-full grow overflow-hidden rounded-full">
+        <SliderPrimitive.Range className="bg-primary absolute h-full" />
       </SliderPrimitive.Track>
       {Array.from({ length: thumbCount }, (_, i) => (
         <SliderPrimitive.Thumb
           key={i}
-          className="block h-4 w-4 rounded-full border border-primary/50 bg-white shadow transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+          className="border-primary/50 focus-visible:ring-ring block h-4 w-4 rounded-full border bg-white shadow transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>

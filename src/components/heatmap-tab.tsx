@@ -14,7 +14,11 @@ const HeatMap = lazy(() => import('./heatmap-map'))
 const DAY_MS = 86_400_000
 
 function fmtDate(ts: number) {
-  return new Date(ts).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })
+  return new Date(ts).toLocaleDateString(undefined, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 const MIN_RES = 1000
@@ -132,21 +136,22 @@ export function HeatmapTab() {
     [loadedResults, debouncedResolution]
   )
 
-  const loadingCount = detailQueries.filter((q) => q.isFetching).length
-
   if (allActivities.length === 0)
     return <p className="text-sm text-gray-500">No activities loaded.</p>
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex flex-wrap items-center gap-3">
         <p className="text-xs text-gray-400">
-          {loadingCount > 0
-            ? `Fetching ${loadingCount} activities…`
-            : `${loadedResults.length} activities · ${heatPoints.length} pts`}
+          `${loadedResults.length} activities · ${heatPoints.length} pts`
         </p>
         {hasNextPage && (
-          <Button variant="outline" size="sm" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+          >
             {isFetchingNextPage ? 'Loading...' : 'Load more activities'}
           </Button>
         )}
@@ -154,7 +159,7 @@ export function HeatmapTab() {
 
       {minTs < maxTs && (
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500 whitespace-nowrap">Date</span>
+          <span className="text-xs whitespace-nowrap text-gray-500">Date</span>
           <Slider
             min={minTs}
             max={maxTs}
@@ -171,14 +176,14 @@ export function HeatmapTab() {
             }}
             className="flex-1"
           />
-          <span className="text-xs text-gray-500 w-44 text-right whitespace-nowrap">
+          <span className="w-44 text-right text-xs whitespace-nowrap text-gray-500">
             {dateFromTs ? fmtDate(dateFromTs) : '—'} – {dateToTs ? fmtDate(dateToTs) : '—'}
           </span>
         </div>
       )}
 
       <div className="flex items-center gap-3">
-        <span className="text-xs text-gray-500 whitespace-nowrap">Sample</span>
+        <span className="text-xs whitespace-nowrap text-gray-500">Sample</span>
         <Slider
           min={1}
           max={dateFilteredActivities.length || 1}
@@ -187,13 +192,13 @@ export function HeatmapTab() {
           onValueChange={([v]) => setSampleSize(v)}
           className="flex-1"
         />
-        <span className="text-xs text-gray-500 w-24 text-right whitespace-nowrap">
+        <span className="w-24 text-right text-xs whitespace-nowrap text-gray-500">
           {sampleSize} / {dateFilteredActivities.length}
         </span>
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-xs text-gray-500 whitespace-nowrap">Resolution</span>
+        <span className="text-xs whitespace-nowrap text-gray-500">Resolution</span>
         <Slider
           min={MIN_RES}
           max={MAX_RES}
@@ -202,14 +207,14 @@ export function HeatmapTab() {
           onValueChange={([v]) => setResolution(v)}
           className="flex-1"
         />
-        <span className="text-xs text-gray-500 w-20 text-right whitespace-nowrap">
+        <span className="w-20 text-right text-xs whitespace-nowrap text-gray-500">
           {resolution.toLocaleString()} pts
         </span>
       </div>
 
       <Suspense
         fallback={
-          <div className="flex h-[480px] items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
+          <div className="bg-muted text-muted-foreground flex h-[480px] items-center justify-center rounded-lg text-sm">
             Loading map…
           </div>
         }

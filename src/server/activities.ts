@@ -82,7 +82,10 @@ export const fetchActivityDetails = createServerFn({ method: 'POST' })
   })
 
 export const fetchActivitiesPage = createServerFn({ method: 'POST' })
-  .inputValidator((input: unknown) => input as { accessToken: string; offset?: number; limit?: number; sort?: string })
+  .inputValidator(
+    (input: unknown) =>
+      input as { accessToken: string; offset?: number; limit?: number; sort?: string }
+  )
   .handler(async (ctx) => {
     const { accessToken, offset = 0, sort = '-startTime' } = ctx.data
     const url = new URL(`${API_BASE}/activities`)

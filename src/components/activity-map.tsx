@@ -26,7 +26,7 @@ export function ActivityMap({
 
   if (positions.length === 0) {
     return (
-      <div className="flex h-[260px] items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
+      <div className="bg-muted text-muted-foreground flex h-[260px] items-center justify-center rounded-lg text-sm">
         No GPS data
       </div>
     )

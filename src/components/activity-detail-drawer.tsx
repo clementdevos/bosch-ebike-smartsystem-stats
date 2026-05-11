@@ -21,9 +21,7 @@ import {
 import { type ActivityDetailPoint } from '../server/activities'
 import type { ActivitySummary } from '../server/activities'
 
-const ActivityMap = lazy(() =>
-  import('./activity-map').then((m) => ({ default: m.ActivityMap }))
-)
+const ActivityMap = lazy(() => import('./activity-map').then((m) => ({ default: m.ActivityMap })))
 
 interface Props {
   summary: ActivitySummary | null
@@ -85,7 +83,7 @@ const MiniChart = memo(function MiniChart({
 }) {
   return (
     <div>
-      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <p className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
         {label}
       </p>
       <ResponsiveContainer width="100%" height={160}>
@@ -150,7 +148,8 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
   const { data, isLoading: loading, error: queryError } = useActivityDetails(summary?.id)
 
   const points = data?.activityDetails ?? []
-  const error = queryError instanceof Error ? queryError.message : queryError ? 'Failed to load' : null
+  const error =
+    queryError instanceof Error ? queryError.message : queryError ? 'Failed to load' : null
 
   const sampledPoints = useMemo(() => downsample(points, resolution), [points, resolution])
   const chartData = useMemo(() => toChartData(sampledPoints), [sampledPoints])
@@ -163,18 +162,19 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
         <DrawerHeader className="flex flex-row items-start justify-between border-b pb-3">
           <div>
             <DrawerTitle>{summary?.title ?? 'Activity'}</DrawerTitle>
-            <DrawerDescription>
-              {summary ? fmtDate(summary.startTime) : ''}
-            </DrawerDescription>
+            <DrawerDescription>{summary ? fmtDate(summary.startTime) : ''}</DrawerDescription>
           </div>
           <div className="flex items-center gap-2">
             {points.length > 0 && (
               <div className="flex items-center gap-1.5">
-                <label className="text-xs text-muted-foreground">Res</label>
+                <label className="text-muted-foreground text-xs">Res</label>
                 <select
                   value={resolution}
-                  onChange={(e) => { setHoveredIndex(null); setResolution(Number(e.target.value)) }}
-                  className="text-xs border rounded px-1.5 py-0.5 bg-background"
+                  onChange={(e) => {
+                    setHoveredIndex(null)
+                    setResolution(Number(e.target.value))
+                  }}
+                  className="bg-background rounded border px-1.5 py-0.5 text-xs"
                 >
                   {RESOLUTION_STEPS.map((s) => (
                     <option key={s} value={s}>
@@ -187,7 +187,7 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
             <DrawerClose asChild>
               <button
                 onClick={onClose}
-                className="rounded-sm p-1 hover:bg-muted"
+                className="hover:bg-muted rounded-sm p-1"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -207,7 +207,7 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
 
         <Suspense
           fallback={
-            <div className="flex h-[260px] items-center justify-center bg-muted text-sm text-muted-foreground">
+            <div className="bg-muted text-muted-foreground flex h-[260px] items-center justify-center text-sm">
               Loading map…
             </div>
           }
@@ -218,14 +218,14 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
           />
         </Suspense>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+        <div className="flex-1 space-y-6 overflow-y-auto px-4 py-4">
           {loading && (
-            <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">
+            <div className="text-muted-foreground flex h-24 items-center justify-center text-sm">
               Loading detail data…
             </div>
           )}
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">{error}</div>
           )}
 
           {!loading && !error && points.length > 0 && (
@@ -280,7 +280,7 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-muted-foreground text-xs">{label}</p>
       <p className="font-semibold">{value}</p>
     </div>
   )

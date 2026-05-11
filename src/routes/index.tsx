@@ -4,13 +4,24 @@ import { RefreshCw } from 'lucide-react'
 import { useAuth } from '../lib/auth-context'
 import { useBikes } from '../components/data/use-bikes'
 import type { Bike } from '../server/bikes'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '../components/ui/card'
 import { Button } from '../components/ui/button'
 
 export const Route = createFileRoute('/')({ component: Home })
 
 function fmtTime(ts: number) {
-  return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  return new Date(ts).toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
 }
 
 function Home() {
@@ -22,30 +33,28 @@ function Home() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-lg">Signing in...</p>
       </div>
     )
   }
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="mx-auto max-w-3xl p-8">
+      <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Your garage</h1>
-        {!tokenSet && (
-          <Button onClick={login}>Sign in with Bosch</Button>
-        )}
+        {!tokenSet && <Button onClick={login}>Sign in with Bosch</Button>}
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-700">
+        <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-red-700">
           {error instanceof Error ? error.message : 'Unknown error'}
         </div>
       )}
 
       {bikes && (
         <>
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <p className="text-xs text-gray-400">
               Updated {dataUpdatedAt ? fmtTime(dataUpdatedAt) : '—'}
             </p>
@@ -58,7 +67,11 @@ function Home() {
             {bikes.length === 0 && (
               <p className="text-gray-500">
                 No bikes found.{' '}
-                <a href="https://flow.bosch-ebike.com/data-act" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="https://flow.bosch-ebike.com/data-act"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Enable third-party app access
                 </a>{' '}
                 in the Bosch eBike Flow portal, then refresh.
@@ -71,17 +84,21 @@ function Home() {
         </>
       )}
 
-      {!tokenSet && (
-        <p className="text-gray-500">Sign in to view your eBike data.</p>
-      )}
+      {!tokenSet && <p className="text-gray-500">Sign in to view your eBike data.</p>}
     </div>
   )
 }
 
-function ComponentInfo({ label, component }: { label: string; component: { productName?: string; serialNumber: string; partNumber: string } | undefined }) {
+function ComponentInfo({
+  label,
+  component,
+}: {
+  label: string
+  component: { productName?: string; serialNumber: string; partNumber: string } | undefined
+}) {
   return (
     <div>
-      <p className="text-sm font-medium mb-1">{label}</p>
+      <p className="mb-1 text-sm font-medium">{label}</p>
       {component ? (
         <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
           {component.productName && (
@@ -130,7 +147,9 @@ function BikeCard({ bike }: { bike: Bike }) {
           {driveUnit.powerOnTime && (
             <>
               <dt className="text-gray-500">Power-on time</dt>
-              <dd>{driveUnit.powerOnTime.total} h ({driveUnit.powerOnTime.withMotorSupport} h motor)</dd>
+              <dd>
+                {driveUnit.powerOnTime.total} h ({driveUnit.powerOnTime.withMotorSupport} h motor)
+              </dd>
             </>
           )}
         </dl>
@@ -138,7 +157,7 @@ function BikeCard({ bike }: { bike: Bike }) {
         <ComponentInfo label="Head unit" component={headUnit} />
         {batteries.length > 0 && (
           <div>
-            <p className="text-sm font-medium mb-1">Batteries</p>
+            <p className="mb-1 text-sm font-medium">Batteries</p>
             {batteries.map((b) => (
               <p key={b.serialNumber} className="text-sm text-gray-600">
                 {b.productName} — {b.serialNumber}
@@ -148,12 +167,17 @@ function BikeCard({ bike }: { bike: Bike }) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="border-t flex-col items-start gap-2">
-        <Button variant="ghost" size="sm" onClick={() => setShowRaw((v) => !v)} className="text-gray-400 hover:text-gray-600 -ml-2.5">
+      <CardFooter className="flex-col items-start gap-2 border-t">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowRaw((v) => !v)}
+          className="-ml-2.5 text-gray-400 hover:text-gray-600"
+        >
           {showRaw ? 'Hide raw' : 'Show raw'}
         </Button>
         {showRaw && (
-          <pre className="w-full p-3 bg-gray-50 rounded text-xs overflow-auto max-h-96">
+          <pre className="max-h-96 w-full overflow-auto rounded bg-gray-50 p-3 text-xs">
             {JSON.stringify(bike, null, 2)}
           </pre>
         )}

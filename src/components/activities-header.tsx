@@ -35,11 +35,11 @@ export function ActivitiesHeader({
   const { enabledBikeIds, toggleBike } = useBikeSelection()
 
   return (
-    <div className="flex items-center gap-6 flex-wrap">
+    <div className="flex flex-wrap items-center gap-6">
       <h1 className="text-3xl font-bold">Activities</h1>
 
       {uniqueBikeIds.length > 1 && (
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {uniqueBikeIds.map((id, i) => {
             const enabled = enabledBikeIds.has(id)
             const color = BIKE_COLORS[i % BIKE_COLORS.length]
@@ -47,7 +47,10 @@ export function ActivitiesHeader({
               <button
                 key={id}
                 onClick={() => toggleBike(id)}
-                className={badgeVariants({ variant: 'outline' }) + ' cursor-pointer transition-opacity px-3 py-1 text-sm'}
+                className={
+                  badgeVariants({ variant: 'outline' }) +
+                  ' cursor-pointer px-3 py-1 text-sm transition-opacity'
+                }
                 style={{
                   borderColor: color,
                   backgroundColor: enabled ? color : 'transparent',
@@ -65,7 +68,12 @@ export function ActivitiesHeader({
       <div className="ml-auto flex items-center gap-3">
         {initialized && dataUpdatedAt > 0 && (
           <p className="text-xs text-gray-400">
-            Updated {new Date(dataUpdatedAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            Updated{' '}
+            {new Date(dataUpdatedAt).toLocaleTimeString(undefined, {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })}
           </p>
         )}
         {initialized && (

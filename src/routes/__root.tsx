@@ -26,36 +26,48 @@ function RootLayout() {
   const { userInfo, logout, tokenSet } = useAuth()
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <nav className="px-8 py-3 flex items-center gap-6 text-sm font-medium border-b border-[var(--line)] bg-[var(--header-bg)] backdrop-blur-sm sticky top-0 z-10">
-        <Link to="/" className="text-slate-500 hover:text-slate-900 [&.active]:text-indigo-600 [&.active]:font-semibold">
+    <div className="flex min-h-screen flex-col">
+      <nav className="sticky top-0 z-10 flex items-center gap-6 border-b border-[var(--line)] bg-[var(--header-bg)] px-8 py-3 text-sm font-medium backdrop-blur-sm">
+        <Link
+          to="/"
+          className="text-slate-500 hover:text-slate-900 [&.active]:font-semibold [&.active]:text-indigo-600"
+        >
           Bikes
         </Link>
-        <Link to="/activities" search={{ activityId: undefined }} className="text-slate-500 hover:text-slate-900 [&.active]:text-indigo-600 [&.active]:font-semibold">
+        <Link
+          to="/activities"
+          search={{ activityId: undefined }}
+          className="text-slate-500 hover:text-slate-900 [&.active]:font-semibold [&.active]:text-indigo-600"
+        >
           Activities
         </Link>
-        <Link to="/heatmap" className="text-slate-500 hover:text-slate-900 [&.active]:text-indigo-600 [&.active]:font-semibold">
+        <Link
+          to="/heatmap"
+          className="text-slate-500 hover:text-slate-900 [&.active]:font-semibold [&.active]:text-indigo-600"
+        >
           Heatmap
         </Link>
         {tokenSet && (
           <div className="ml-auto flex items-center gap-4">
             {(userInfo?.email || userInfo?.name) && (
-              <span className="text-gray-500 text-xs">{userInfo.email ?? userInfo.name}</span>
+              <span className="text-xs text-gray-500">{userInfo.email ?? userInfo.name}</span>
             )}
-            <Button variant="outline" size="sm" onClick={logout}>Sign out</Button>
+            <Button variant="outline" size="sm" onClick={logout}>
+              Sign out
+            </Button>
           </div>
         )}
       </nav>
       <main className="flex-1">
         <Outlet />
       </main>
-      <footer className="border-t border-[var(--line)] bg-[var(--header-bg)] px-8 text-xs text-slate-400 flex items-center justify-between min-h-[40px]">
+      <footer className="flex min-h-[40px] items-center justify-between border-t border-[var(--line)] bg-[var(--header-bg)] px-8 text-xs text-slate-400">
         <span>© {new Date().getFullYear()} Clément Devos</span>
         <a
           href="https://github.com/clementdevos/bosch-ebike-smartsystem-stats"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-gray-600 underline underline-offset-2"
+          className="underline underline-offset-2 hover:text-gray-600"
         >
           GitHub
         </a>
@@ -80,9 +92,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <BikeSelectionProvider>
-              {children}
-            </BikeSelectionProvider>
+            <BikeSelectionProvider>{children}</BikeSelectionProvider>
           </AuthProvider>
         </QueryClientProvider>
         <TanStackDevtools

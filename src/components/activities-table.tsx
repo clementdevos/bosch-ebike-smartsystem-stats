@@ -32,58 +32,70 @@ function fmt(seconds: number) {
 }
 
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })
+  return new Date(iso).toLocaleDateString(undefined, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRowClick }: Props) {
   const queryClient = useQueryClient()
   const showBikeCol = uniqueBikeIds.length > 1
 
-  const bikeName = useCallback((bikeId: string) => {
-    const bike = bikes.find((b) => b.id === bikeId)
-    return bike ? (bike.driveUnit.productName ?? bikeId.slice(0, 8)) : bikeId.slice(0, 8)
-  }, [bikes])
+  const bikeName = useCallback(
+    (bikeId: string) => {
+      const bike = bikes.find((b) => b.id === bikeId)
+      return bike ? (bike.driveUnit.productName ?? bikeId.slice(0, 8)) : bikeId.slice(0, 8)
+    },
+    [bikes]
+  )
 
-  const columns = useMemo(() => [
-    colHelper.accessor('startTime', {
-      header: 'Date',
-      cell: (i) => fmtDate(i.getValue()),
-      sortingFn: 'datetime',
-    }),
-    colHelper.accessor('title', {
-      header: 'Title',
-      cell: (i) => i.getValue() ?? '—',
-      enableSorting: false,
-    }),
-    ...(showBikeCol
-      ? [colHelper.accessor('bikeId', {
-          header: 'Bike',
-          cell: (i) => bikeName(i.getValue()),
-          enableSorting: false,
-        })]
-      : []),
-    colHelper.accessor('distance', {
-      header: 'Distance',
-      cell: (i) => `${(i.getValue() / 1000).toFixed(1)} km`,
-      meta: { align: 'right' },
-    }),
-    colHelper.accessor('durationWithoutStops', {
-      header: 'Duration',
-      cell: (i) => fmt(i.getValue()),
-      meta: { align: 'right' },
-    }),
-    colHelper.accessor((row) => row.speed.average, {
-      id: 'avgSpeed',
-      header: 'Avg speed',
-      cell: (i) => `${i.getValue().toFixed(1)} km/h`,
-      meta: { align: 'right' },
-    }),
-    colHelper.accessor('startOdometer', {
-      header: 'Odometer',
-      cell: (i) => `${(i.getValue() / 1000).toFixed(0)} km`,
-      meta: { align: 'right' },
-    }),
-  ], [showBikeCol, bikeName])
+  const columns = useMemo(
+    () => [
+      colHelper.accessor('startTime', {
+        header: 'Date',
+        cell: (i) => fmtDate(i.getValue()),
+        sortingFn: 'datetime',
+      }),
+      colHelper.accessor('title', {
+        header: 'Title',
+        cell: (i) => i.getValue() ?? '—',
+        enableSorting: false,
+      }),
+      ...(showBikeCol
+        ? [
+            colHelper.accessor('bikeId', {
+              header: 'Bike',
+              cell: (i) => bikeName(i.getValue()),
+              enableSorting: false,
+            }),
+          ]
+        : []),
+      colHelper.accessor('distance', {
+        header: 'Distance',
+        cell: (i) => `${(i.getValue() / 1000).toFixed(1)} km`,
+        meta: { align: 'right' },
+      }),
+      colHelper.accessor('durationWithoutStops', {
+        header: 'Duration',
+        cell: (i) => fmt(i.getValue()),
+        meta: { align: 'right' },
+      }),
+      colHelper.accessor((row) => row.speed.average, {
+        id: 'avgSpeed',
+        header: 'Avg speed',
+        cell: (i) => `${i.getValue().toFixed(1)} km/h`,
+        meta: { align: 'right' },
+      }),
+      colHelper.accessor('startOdometer', {
+        header: 'Odometer',
+        cell: (i) => `${(i.getValue() / 1000).toFixed(0)} km`,
+        meta: { align: 'right' },
+      }),
+    ],
+    [showBikeCol, bikeName]
+  )
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'startTime', desc: true }])
 
@@ -107,7 +119,7 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse">
+          <table className="w-full border-collapse text-sm">
             <thead>
               {table.getHeaderGroups().map((hg) => (
                 <tr key={hg.id} className="border-b text-left text-gray-500">
@@ -123,16 +135,19 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
                       >
                         <span className="inline-flex items-center gap-1">
                           {flexRender(header.column.columnDef.header, header.getContext())}
-                          {canSort && (
-                            sorted === 'asc' ? <ChevronUp className="h-3 w-3" /> :
-                            sorted === 'desc' ? <ChevronDown className="h-3 w-3" /> :
-                            <ChevronsUpDown className="h-3 w-3 opacity-40" />
-                          )}
+                          {canSort &&
+                            (sorted === 'asc' ? (
+                              <ChevronUp className="h-3 w-3" />
+                            ) : sorted === 'desc' ? (
+                              <ChevronDown className="h-3 w-3" />
+                            ) : (
+                              <ChevronsUpDown className="h-3 w-3 opacity-40" />
+                            ))}
                         </span>
                       </th>
                     )
                   })}
-                  <th className="px-4 py-3 w-4" />
+                  <th className="w-4 px-4 py-3" />
                 </tr>
               ))}
             </thead>
@@ -143,7 +158,7 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
                 return (
                   <tr
                     key={row.id}
-                    className="border-b hover:bg-gray-50 cursor-pointer"
+                    className="cursor-pointer border-b hover:bg-gray-50"
                     onClick={() => onRowClick(a.id)}
                   >
                     {row.getVisibleCells().map((cell) => {
@@ -154,8 +169,13 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
                         </td>
                       )
                     })}
-                    <td className="px-4 py-2 w-4">
-                      {cached && <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500" title="Details loaded" />}
+                    <td className="w-4 px-4 py-2">
+                      {cached && (
+                        <span
+                          className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500"
+                          title="Details loaded"
+                        />
+                      )}
                     </td>
                   </tr>
                 )
@@ -163,12 +183,26 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
             </tbody>
           </table>
         </div>
-        <div className="flex items-center px-4 py-3 border-t gap-2">
-          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>←</Button>
+        <div className="flex items-center gap-2 border-t px-4 py-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            ←
+          </Button>
           <span className="text-xs text-gray-600">
             Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
           </span>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>→</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            →
+          </Button>
         </div>
       </CardContent>
     </Card>
