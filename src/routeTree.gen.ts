@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as HeatmapRouteImport } from './routes/heatmap'
 import { Route as CallbackRouteImport } from './routes/callback'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
 
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HeatmapRoute = HeatmapRouteImport.update({
   id: '/heatmap',
   path: '/heatmap',
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/activities': typeof ActivitiesRoute
   '/callback': typeof CallbackRoute
   '/heatmap': typeof HeatmapRoute
+  '/privacy': typeof PrivacyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
   '/callback': typeof CallbackRoute
   '/heatmap': typeof HeatmapRoute
+  '/privacy': typeof PrivacyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/activities': typeof ActivitiesRoute
   '/callback': typeof CallbackRoute
   '/heatmap': typeof HeatmapRoute
+  '/privacy': typeof PrivacyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/activities' | '/callback' | '/heatmap'
+  fullPaths: '/' | '/activities' | '/callback' | '/heatmap' | '/privacy'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/activities' | '/callback' | '/heatmap'
-  id: '__root__' | '/' | '/activities' | '/callback' | '/heatmap'
+  to: '/' | '/activities' | '/callback' | '/heatmap' | '/privacy'
+  id: '__root__' | '/' | '/activities' | '/callback' | '/heatmap' | '/privacy'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,10 +76,18 @@ export interface RootRouteChildren {
   ActivitiesRoute: typeof ActivitiesRoute
   CallbackRoute: typeof CallbackRoute
   HeatmapRoute: typeof HeatmapRoute
+  PrivacyRoute: typeof PrivacyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/heatmap': {
       id: '/heatmap'
       path: '/heatmap'
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   ActivitiesRoute: ActivitiesRoute,
   CallbackRoute: CallbackRoute,
   HeatmapRoute: HeatmapRoute,
+  PrivacyRoute: PrivacyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
