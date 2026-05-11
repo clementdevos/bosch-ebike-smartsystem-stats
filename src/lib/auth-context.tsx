@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { useQueryClient } from '@tanstack/react-query'
 import { generateCodeVerifier, generateCodeChallenge, generateState } from './pkce'
 import { AUTH_CONFIG } from './auth-config'
-import { exchangeCodeFn, logoutFn, getSessionUserFn, type UserInfo } from '../server/auth'
+import { exchangeCodeFn, logoutFn, getSessionUserFn, type UserInfo } from '../server/auth-fns'
 
 export type { UserInfo }
 

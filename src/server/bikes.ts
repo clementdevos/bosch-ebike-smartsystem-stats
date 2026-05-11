@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getTokenFromSession } from './auth'
+import { getTokenFromSession } from './auth.server'
 
 const API_BASE = 'https://api.bosch-ebike.com/bike-profile/smart-system/v1'
 
