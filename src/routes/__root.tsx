@@ -75,6 +75,16 @@ function RootLayout() {
 
       <footer className="hidden min-h-[40px] items-center justify-between border-t border-[var(--line)] bg-[var(--header-bg)] px-8 text-xs text-slate-400 min-[500px]:flex">
         <span>© {new Date().getFullYear()} Clément Devos</span>
+        <div className="flex items-center gap-4">
+          <a
+            href="https://flow.bosch-ebike.com/data-act"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-gray-600"
+            title="Manage third-party app permissions"
+          >
+            Bosch app permissions
+          </a>
         <a
           href="https://github.com/clementdevos/bosch-ebike-smartsystem-stats"
           target="_blank"
@@ -83,6 +93,7 @@ function RootLayout() {
         >
           GitHub
         </a>
+        </div>
       </footer>
 
       {/* Mobile bottom tab nav — visible below 500px */}
