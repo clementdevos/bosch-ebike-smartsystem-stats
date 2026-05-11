@@ -1,3 +1,7 @@
+.claude/
+.idea/
+.vscode
+.cta
 node_modules
 .DS_Store
 dist

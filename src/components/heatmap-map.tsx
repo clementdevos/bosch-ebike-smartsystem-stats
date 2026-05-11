@@ -12,7 +12,7 @@ const DEFAULT_CENTER: [number, number] = [50.85, 4.35]
 
 function HeatLayer({ points }: { points: HeatPoint[] }) {
   const map = useMap()
-  const layerRef = useRef<L.Layer | null>(null)
+  const layerRef = useRef<L.HeatLayer | null>(null)
 
   useEffect(() => {
     if (layerRef.current) {
@@ -20,8 +20,7 @@ function HeatLayer({ points }: { points: HeatPoint[] }) {
       layerRef.current = null
     }
     if (points.length === 0) return
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const layer = (L as any).heatLayer(points, { radius: 6, blur: 4, maxZoom: 17 })
+    const layer = L.heatLayer(points, { radius: 6, blur: 4, maxZoom: 17 })
     layer.addTo(map)
     layerRef.current = layer
     return () => {

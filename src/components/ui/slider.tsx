@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import { cn } from '#/lib/utils.ts'
 
-const DEBOUNCE_MS = 120
+const DEBOUNCE_MS = 400
 
 function Slider({
   className,
