@@ -25,7 +25,7 @@ function fmtTime(ts: number) {
 }
 
 function Home() {
-  const { tokenSet, login, isLoading } = useAuth()
+  const { isAuthenticated, login, isLoading } = useAuth()
 
   const { data, isFetching, error, refetch, dataUpdatedAt } = useBikes()
 
@@ -43,7 +43,7 @@ function Home() {
     <div className="mx-auto max-w-3xl p-8">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Your garage</h1>
-        {!tokenSet && <Button onClick={login}>Sign in with Bosch</Button>}
+        {!isAuthenticated && <Button onClick={login}>Sign in with Bosch</Button>}
       </div>
 
       {error && (
@@ -84,7 +84,38 @@ function Home() {
         </>
       )}
 
-      {!tokenSet && <p className="text-gray-500">Sign in to view your eBike data.</p>}
+      {!isAuthenticated && (
+        <div className="space-y-3">
+          <p className="text-gray-500">Sign in to view your eBike data.</p>
+          <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+            <p className="mb-2 font-medium text-slate-700 dark:text-slate-300">
+              Session &amp; security
+            </p>
+            <ul className="space-y-1.5">
+              <li>
+                Auth uses <strong>OAuth 2.0 + PKCE</strong> via Bosch SingleKey ID — no password is
+                ever handled by this app.
+              </li>
+              <li>
+                Tokens are stored in an <strong>encrypted, HttpOnly server-side cookie</strong>.
+                They are never exposed to the browser or JavaScript.
+              </li>
+              <li>
+                The cookie is encrypted with AES-GCM using a server-only secret. Even if the cookie
+                is intercepted, the raw tokens cannot be read.
+              </li>
+              <li>
+                Session lasts up to <strong>30 days</strong>. The access token is automatically
+                refreshed server-side before it expires — no re-login needed.
+              </li>
+              <li>
+                No eBike data, tokens, or personal information is stored in any database. The server
+                logs nothing.
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

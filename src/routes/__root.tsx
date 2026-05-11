@@ -30,7 +30,7 @@ const navLinkClass =
   'text-slate-500 hover:text-slate-900 [&.active]:font-semibold [&.active]:text-indigo-600'
 
 function RootLayout() {
-  const { userInfo, logout, tokenSet } = useAuth()
+  const { userInfo, logout, isAuthenticated } = useAuth()
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -45,7 +45,7 @@ function RootLayout() {
         <Link to="/heatmap" className={navLinkClass}>
           Heatmap
         </Link>
-        {tokenSet && (
+        {isAuthenticated && (
           <div className="ml-auto flex items-center gap-4">
             {(userInfo?.email || userInfo?.name) && (
               <span className="text-xs text-gray-500">{userInfo.email ?? userInfo.name}</span>
@@ -62,7 +62,7 @@ function RootLayout() {
         <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
           Bosch eBike Stats
         </span>
-        {tokenSet && (
+        {isAuthenticated && (
           <Button variant="outline" size="sm" onClick={logout}>
             Sign out
           </Button>

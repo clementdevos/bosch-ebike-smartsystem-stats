@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getTokenFromSession } from './auth'
 
 const API_BASE = 'https://api.bosch-ebike.com/activity/smart-system/v1'
 
@@ -68,10 +69,10 @@ export interface ActivityDetailsResponse {
 }
 
 export const fetchActivityDetails = createServerFn({ method: 'POST' })
-  .inputValidator((input: unknown) => input as { accessToken: string; activityId: string })
+  .inputValidator((input: unknown) => input as { activityId: string })
   .handler(async (ctx) => {
-    const { accessToken, activityId } = ctx.data
-    const res = await fetch(`${API_BASE}/activities/${activityId}/details`, {
+    const accessToken = await getTokenFromSession()
+    const res = await fetch(`${API_BASE}/activities/${ctx.data.activityId}/details`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
     if (!res.ok) {
@@ -82,12 +83,10 @@ export const fetchActivityDetails = createServerFn({ method: 'POST' })
   })
 
 export const fetchActivitiesPage = createServerFn({ method: 'POST' })
-  .inputValidator(
-    (input: unknown) =>
-      input as { accessToken: string; offset?: number; limit?: number; sort?: string }
-  )
+  .inputValidator((input: unknown) => input as { offset?: number; sort?: string })
   .handler(async (ctx) => {
-    const { accessToken, offset = 0, sort = '-startTime' } = ctx.data
+    const accessToken = await getTokenFromSession()
+    const { offset = 0, sort = '-startTime' } = ctx.data
     const url = new URL(`${API_BASE}/activities`)
     url.searchParams.set('offset', String(offset))
     url.searchParams.set('limit', String(100))

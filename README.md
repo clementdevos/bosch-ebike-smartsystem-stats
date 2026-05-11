@@ -8,9 +8,16 @@ A personal dashboard for Bosch Smart System eBike data — activities, odometer 
 
 ---
 
-## Privacy
+## Privacy & security
 
-**No data leaves your browser.** Auth tokens are stored in `sessionStorage` only and cleared when the tab closes (unless a refresh token is issued via `offline_access`). No analytics, no telemetry, no database. Everything is fetched live from the Bosch eBike Cloud API and rendered locally. The server-side proxy exists solely to avoid CORS restrictions — it does not log or persist anything.
+Authentication uses **OAuth 2.0 + PKCE** via Bosch SingleKey ID — no password is ever handled by this app.
+
+After sign-in, the access and refresh tokens are stored in an **encrypted, HttpOnly server-side cookie**. They are never sent to or readable by the browser or JavaScript. The cookie is encrypted with AES-GCM using the `SESSION_SECRET` env var; intercepting the cookie without the key yields nothing usable.
+
+- **Session duration:** up to 30 days. The access token is automatically refreshed server-side before it expires — no re-login needed until the refresh token itself expires.
+- **No database.** No eBike data, tokens, or personal information is persisted anywhere. The server does not log requests.
+- **No analytics, no telemetry.** Everything is fetched live from the Bosch eBike Cloud API and rendered client-side.
+- The server-side proxy exists solely to hold the session and forward requests to Bosch — it stores nothing beyond the encrypted cookie.
 
 ---
 
@@ -47,7 +54,10 @@ Create `.env.local`:
 
 ```env
 VITE_BOSCH_CLIENT_ID=your-client-id-here
+SESSION_SECRET=a-random-string-of-at-least-32-characters
 ```
+
+`SESSION_SECRET` is used to encrypt the server-side session cookie (HttpOnly — tokens never reach the browser). Generate one with `openssl rand -base64 32`.
 
 Register `https://localhost:8080/callback` as an allowed redirect URI in your Bosch EUDA client registration.
 

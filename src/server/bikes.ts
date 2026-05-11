@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getTokenFromSession } from './auth'
 
 const API_BASE = 'https://api.bosch-ebike.com/bike-profile/smart-system/v1'
 
@@ -58,22 +59,14 @@ export interface BikesResponse {
   bikes: Bike[]
 }
 
-export const fetchBikes = createServerFn({ method: 'POST' })
-  .inputValidator((accessToken: unknown) => {
-    if (typeof accessToken !== 'string' || !accessToken) {
-      throw new Error('accessToken required')
-    }
-    return accessToken
+export const fetchBikes = createServerFn({ method: 'GET' }).handler(async () => {
+  const accessToken = await getTokenFromSession()
+  const res = await fetch(`${API_BASE}/bikes`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
   })
-  .handler(async (ctx) => {
-    const accessToken = ctx.data
-    const res = await fetch(`${API_BASE}/bikes`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    if (!res.ok) {
-      const text = await res.text()
-      throw new Error(`listBikes failed: ${res.status} ${text}`)
-    }
-
-    return res.json() as Promise<BikesResponse>
-  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`listBikes failed: ${res.status} ${text}`)
+  }
+  return res.json() as Promise<BikesResponse>
+})

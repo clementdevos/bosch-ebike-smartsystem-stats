@@ -3,14 +3,11 @@ import { fetchActivityDetails } from '../../server/activities'
 import { useAuth } from '../../lib/auth-context'
 
 export function useActivityDetails(activityId: string | undefined) {
-  const { tokenSet } = useAuth()
+  const { isAuthenticated } = useAuth()
   return useQuery({
     queryKey: ['activity-details', activityId],
-    queryFn: () =>
-      fetchActivityDetails({
-        data: { accessToken: tokenSet!.accessToken, activityId: activityId! },
-      }),
-    enabled: !!activityId && !!tokenSet,
+    queryFn: () => fetchActivityDetails({ data: { activityId: activityId! } }),
+    enabled: !!activityId && isAuthenticated,
     staleTime: 30 * 60 * 1000,
   })
 }

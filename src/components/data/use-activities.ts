@@ -3,18 +3,18 @@ import { fetchActivitiesPage } from '../../server/activities'
 import { useAuth } from '../../lib/auth-context'
 
 export function useActivities() {
-  const { tokenSet } = useAuth()
+  const { isAuthenticated } = useAuth()
   return useInfiniteQuery({
-    queryKey: ['activities', tokenSet?.accessToken],
+    queryKey: ['activities'],
     queryFn: ({ pageParam }: { pageParam: number }) =>
-      fetchActivitiesPage({ data: { accessToken: tokenSet!.accessToken, offset: pageParam } }),
+      fetchActivitiesPage({ data: { offset: pageParam } }),
     getNextPageParam: (lastPage) => {
       const { offset, limit, total } = lastPage.pagination
       const next = offset + limit
       return next < total ? next : undefined
     },
     initialPageParam: 0,
-    enabled: !!tokenSet,
+    enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000,
   })
 }

@@ -55,7 +55,7 @@ function buildHeatPoints(
 }
 
 export function HeatmapTab() {
-    const {tokenSet} = useAuth()
+    const {isAuthenticated} = useAuth()
     const {
         data: activitiesData,
         fetchNextPage,
@@ -121,10 +121,9 @@ export function HeatmapTab() {
     const detailQueries = useQueries({
         queries: sampledActivities.map((a) => ({
             queryKey: ['activity-details', a.id],
-            queryFn: () =>
-                fetchActivityDetails({data: {accessToken: tokenSet!.accessToken, activityId: a.id}}),
+            queryFn: () => fetchActivityDetails({data: {activityId: a.id}}),
             staleTime: 30 * 60 * 1000,
-            enabled: !!tokenSet,
+            enabled: isAuthenticated,
         })),
     })
 

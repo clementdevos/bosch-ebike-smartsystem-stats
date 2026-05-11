@@ -47,7 +47,7 @@ function buildChartData(activities: ActivitySummary[], enabledIds: Set<string>):
 }
 
 export default function ActivitiesPage() {
-  const { tokenSet, login } = useAuth()
+  const { isAuthenticated, login } = useAuth()
   const { activityId } = Route.useSearch()
   const navigate = useNavigate({ from: '/activities' })
   const { enabledBikeIds, enableAll } = useBikeSelection()
@@ -132,7 +132,7 @@ export default function ActivitiesPage() {
     navigate({ search: { activityId: undefined } })
   }, [navigate])
 
-  if (!tokenSet) {
+  if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center gap-4 p-8">
         <p className="text-gray-600">Sign in to view activities.</p>
@@ -183,7 +183,7 @@ export default function ActivitiesPage() {
         )}
       </div>
 
-      {tokenSet && <ActivityDetailDrawer summary={selectedActivity} onClose={closeActivity} />}
+      {isAuthenticated && <ActivityDetailDrawer summary={selectedActivity} onClose={closeActivity} />}
     </>
   )
 }
