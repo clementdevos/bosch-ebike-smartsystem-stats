@@ -55,7 +55,12 @@ export function OdometerChart({
               formatter={(value, name) => [`${value} km`, bikeName(name as string)]}
               labelFormatter={(label) => `Date: ${label}`}
             />
-            {enabledIds.length > 1 && <Legend formatter={(id) => bikeName(id)} />}
+            {enabledIds.length > 1 && (
+              <Legend
+                formatter={(id) => bikeName(id)}
+                wrapperStyle={{ fontSize: 11, whiteSpace: 'normal', lineHeight: '1.6' }}
+              />
+            )}
             {enabledIds.map((id) => (
               <Line
                 key={id}

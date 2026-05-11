@@ -65,7 +65,7 @@ export function ActivitiesHeader({
         </div>
       )}
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="flex w-full flex-wrap items-center gap-3 min-[500px]:ml-auto min-[500px]:w-auto">
         {initialized && dataUpdatedAt > 0 && (
           <p className="text-xs text-gray-400">
             Updated{' '}
@@ -83,8 +83,14 @@ export function ActivitiesHeader({
           </Button>
         )}
         {hasMore && (
-          <Button variant="outline" size="sm" onClick={onLoadMore} disabled={loadingMore}>
-            {loadingMore ? 'Loading...' : `Load more (${total! - loadedCount} remaining)`}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onLoadMore}
+            disabled={loadingMore}
+            className="max-w-full truncate"
+          >
+            {loadingMore ? 'Loading…' : `Load more (${total! - loadedCount} remaining)`}
           </Button>
         )}
       </div>

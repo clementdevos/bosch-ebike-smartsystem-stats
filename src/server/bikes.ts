@@ -70,7 +70,6 @@ export const fetchBikes = createServerFn({ method: 'POST' })
     const res = await fetch(`${API_BASE}/bikes`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
-    console.log({ accessToken })
     if (!res.ok) {
       const text = await res.text()
       throw new Error(`listBikes failed: ${res.status} ${text}`)
