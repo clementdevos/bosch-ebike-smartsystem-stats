@@ -1,8 +1,10 @@
 # Bosch eBike Smart System Stats
 
+**Live:** [bosch-smartsystem-ebike-stats.vercel.app](https://bosch-smartsystem-ebike-stats.vercel.app/)
+
 A personal dashboard for Bosch Smart System eBike data — activities, odometer history, and bike profiles — pulled from the [Bosch eBike Cloud API (EUDA)](https://www.bosch-ebike.com/en/services/connectivity).
 
-> **⚠️ Vibe-coded project** — This was largely built with AI assistance and may contain rough edges, incomplete error handling, or non-idiomatic patterns. Use at your own risk.
+> **⚠️ AI Trigger warning : ** — This was largely built with AI assistance and may contain rough edges, incomplete error handling, or non-idiomatic patterns. Use at your own risk.
 
 ---
 
