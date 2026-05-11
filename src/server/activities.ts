@@ -53,6 +53,34 @@ export interface ActivitiesPage {
   links: PaginationLinks
 }
 
+export interface ActivityDetailPoint {
+  distance: number
+  altitude: number
+  speed: number
+  cadence: number
+  latitude: number
+  longitude: number
+  riderPower: number
+}
+
+export interface ActivityDetailsResponse {
+  activityDetails: ActivityDetailPoint[]
+}
+
+export const fetchActivityDetails = createServerFn({ method: 'POST' })
+  .inputValidator((input: unknown) => input as { accessToken: string; activityId: string })
+  .handler(async (ctx) => {
+    const { accessToken, activityId } = ctx.data
+    const res = await fetch(`${API_BASE}/activities/${activityId}/details`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    if (!res.ok) {
+      const text = await res.text()
+      throw new Error(`fetchActivityDetails failed: ${res.status} ${text}`)
+    }
+    return res.json() as Promise<ActivityDetailsResponse>
+  })
+
 export const fetchActivitiesPage = createServerFn({ method: 'POST' })
   .inputValidator((input: unknown) => input as { accessToken: string; offset?: number; limit?: number; sort?: string })
   .handler(async (ctx) => {

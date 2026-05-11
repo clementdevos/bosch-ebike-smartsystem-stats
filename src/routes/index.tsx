@@ -1,33 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { RefreshCw } from 'lucide-react'
 import { useAuth } from '../lib/auth-context'
-import { fetchBikes, type Bike } from '../server/bikes'
+import { useBikes } from '../components/data/use-bikes'
+import type { Bike } from '../server/bikes'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card'
+import { Button } from '../components/ui/button'
 
 export const Route = createFileRoute('/')({ component: Home })
 
+function fmtTime(ts: number) {
+  return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+}
+
 function Home() {
-  const { tokenSet, login, logout, isLoading } = useAuth()
-  const [bikes, setBikes] = useState<Bike[] | null>(null)
-  const [bikesLoading, setBikesLoading] = useState(false)
-  const [bikesError, setBikesError] = useState<string | null>(null)
+  const { tokenSet, login, isLoading } = useAuth()
 
-  useEffect(() => {
-    if (tokenSet && !isLoading) loadBikes()
-  }, [tokenSet, isLoading])
+  const { data, isFetching, error, refetch, dataUpdatedAt } = useBikes()
 
-  async function loadBikes() {
-    if (!tokenSet) return
-    setBikesLoading(true)
-    setBikesError(null)
-    try {
-      const data = await fetchBikes({ data: tokenSet.accessToken })
-      setBikes(data.bikes)
-    } catch (err) {
-      setBikesError(err instanceof Error ? err.message : 'Unknown error')
-    } finally {
-      setBikesLoading(false)
-    }
-  }
+  const bikes = data?.bikes ?? null
 
   if (isLoading) {
     return (
@@ -40,49 +31,47 @@ function Home() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Bosch eBike Stats</h1>
-        {tokenSet ? (
-          <div className="flex gap-3">
-            <button
-              onClick={loadBikes}
-              disabled={bikesLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              {bikesLoading ? 'Loading...' : 'Load Bikes'}
-            </button>
-            <button
-              onClick={logout}
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
-            >
-              Sign out
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={login}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Sign in with Bosch
-          </button>
+        <h1 className="text-3xl font-bold">Your garage</h1>
+        {!tokenSet && (
+          <Button onClick={login}>Sign in with Bosch</Button>
         )}
       </div>
 
-      {bikesError && (
+      {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-700">
-          {bikesError}
+          {error instanceof Error ? error.message : 'Unknown error'}
         </div>
       )}
 
       {bikes && (
-        <div className="space-y-4">
-          {bikes.length === 0 && <p className="text-gray-500">No bikes found.</p>}
-          {bikes.map((bike) => (
-            <BikeCard key={bike.driveUnit.serialNumber} bike={bike} />
-          ))}
-        </div>
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs text-gray-400">
+              Updated {dataUpdatedAt ? fmtTime(dataUpdatedAt) : '—'}
+            </p>
+            <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+              <RefreshCw className={`h-3 w-3 ${isFetching ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+          <div className="space-y-4">
+            {bikes.length === 0 && (
+              <p className="text-gray-500">
+                No bikes found.{' '}
+                <a href="https://flow.bosch-ebike.com/data-act" target="_blank" rel="noopener noreferrer">
+                  Enable third-party app access
+                </a>{' '}
+                in the Bosch eBike Flow portal, then refresh.
+              </p>
+            )}
+            {bikes.map((bike) => (
+              <BikeCard key={bike.driveUnit.serialNumber} bike={bike} />
+            ))}
+          </div>
+        </>
       )}
 
-      {!tokenSet && !bikes && (
+      {!tokenSet && (
         <p className="text-gray-500">Sign in to view your eBike data.</p>
       )}
     </div>
@@ -117,59 +106,58 @@ function BikeCard({ bike }: { bike: Bike }) {
   const { driveUnit, batteries, headUnit, remoteControl } = bike
   const [showRaw, setShowRaw] = useState(false)
   return (
-    <div className="border rounded-lg p-5 space-y-3">
-      <div>
-        <h2 className="text-xl font-semibold">{driveUnit.productName ?? driveUnit.serialNumber}</h2>
-        <p className="text-gray-500 text-xs font-mono">{bike.id}</p>
-      </div>
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-        <dt className="text-gray-500">Drive unit serial</dt>
-        <dd className="font-mono">{driveUnit.serialNumber}</dd>
-        {driveUnit.odometer != null && (
-          <>
-            <dt className="text-gray-500">Odometer</dt>
-            <dd>{(driveUnit.odometer / 1000).toFixed(1)} km</dd>
-          </>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">{driveUnit.productName ?? driveUnit.serialNumber}</CardTitle>
+        <CardDescription className="font-mono">{bike.id}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+          <dt className="text-gray-500">Drive unit serial</dt>
+          <dd className="font-mono">{driveUnit.serialNumber}</dd>
+          {driveUnit.odometer != null && (
+            <>
+              <dt className="text-gray-500">Odometer</dt>
+              <dd>{(driveUnit.odometer / 1000).toFixed(1)} km</dd>
+            </>
+          )}
+          {driveUnit.maximumAssistanceSpeed != null && (
+            <>
+              <dt className="text-gray-500">Max assist speed</dt>
+              <dd>{driveUnit.maximumAssistanceSpeed} km/h</dd>
+            </>
+          )}
+          {driveUnit.powerOnTime && (
+            <>
+              <dt className="text-gray-500">Power-on time</dt>
+              <dd>{driveUnit.powerOnTime.total} h ({driveUnit.powerOnTime.withMotorSupport} h motor)</dd>
+            </>
+          )}
+        </dl>
+        <ComponentInfo label="Remote control" component={remoteControl} />
+        <ComponentInfo label="Head unit" component={headUnit} />
+        {batteries.length > 0 && (
+          <div>
+            <p className="text-sm font-medium mb-1">Batteries</p>
+            {batteries.map((b) => (
+              <p key={b.serialNumber} className="text-sm text-gray-600">
+                {b.productName} — {b.serialNumber}
+                {b.chargeCycles && ` (${b.chargeCycles.total} cycles)`}
+              </p>
+            ))}
+          </div>
         )}
-        {driveUnit.maximumAssistanceSpeed != null && (
-          <>
-            <dt className="text-gray-500">Max assist speed</dt>
-            <dd>{driveUnit.maximumAssistanceSpeed} km/h</dd>
-          </>
-        )}
-        {driveUnit.powerOnTime && (
-          <>
-            <dt className="text-gray-500">Power-on time</dt>
-            <dd>{driveUnit.powerOnTime.total} h ({driveUnit.powerOnTime.withMotorSupport} h motor)</dd>
-          </>
-        )}
-      </dl>
-      <ComponentInfo label="Remote control" component={remoteControl} />
-      <ComponentInfo label="Head unit" component={headUnit} />
-      {batteries.length > 0 && (
-        <div>
-          <p className="text-sm font-medium mb-1">Batteries</p>
-          {batteries.map((b) => (
-            <p key={b.serialNumber} className="text-sm text-gray-600">
-              {b.productName} — {b.serialNumber}
-              {b.chargeCycles && ` (${b.chargeCycles.total} cycles)`}
-            </p>
-          ))}
-        </div>
-      )}
-      <div className="border-t pt-3">
-        <button
-          onClick={() => setShowRaw((v) => !v)}
-          className="text-xs text-gray-400 hover:text-gray-600"
-        >
+      </CardContent>
+      <CardFooter className="border-t flex-col items-start gap-2">
+        <Button variant="ghost" size="sm" onClick={() => setShowRaw((v) => !v)} className="text-gray-400 hover:text-gray-600 -ml-2.5">
           {showRaw ? 'Hide raw' : 'Show raw'}
-        </button>
+        </Button>
         {showRaw && (
-          <pre className="mt-2 p-3 bg-gray-50 rounded text-xs overflow-auto max-h-96">
+          <pre className="w-full p-3 bg-gray-50 rounded text-xs overflow-auto max-h-96">
             {JSON.stringify(bike, null, 2)}
           </pre>
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   )
 }

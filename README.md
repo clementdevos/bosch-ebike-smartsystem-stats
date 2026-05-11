@@ -6,13 +6,21 @@ A personal dashboard for Bosch Smart System eBike data — activities, odometer 
 
 ---
 
+## Privacy
+
+**No data leaves your browser.** Auth tokens are stored in `sessionStorage` only and cleared when the tab closes (unless a refresh token is issued via `offline_access`). No analytics, no telemetry, no database. Everything is fetched live from the Bosch eBike Cloud API and rendered locally. The server-side proxy exists solely to avoid CORS restrictions — it does not log or persist anything.
+
+---
+
 ## Features
 
 - **OAuth 2.0 / PKCE** authentication via Bosch SingleKey ID
-- **Bike profiles** — drive unit, battery, remote control details
-- **Activity history** — paginated list with distance, duration, speed, odometer
-- **Odometer chart** — per-bike line chart over time
-- Server-side Bosch API calls (avoids CORS restrictions)
+- **Garage** — bike profiles with drive unit, battery, remote control, and head unit details
+- **Activity history** — paginated list with distance, elevation, duration, speed, and assist level breakdown; click any row for full detail
+- **Odometer chart** — per-bike cumulative distance over time
+- **Heatmap** — GPS ride density map from activity traces, with date-range, sample size, and resolution controls
+- **Multi-bike** — per-bike filtering across all views
+- Server-side Bosch API proxy (avoids CORS, stores nothing)
 
 ## Tech stack
 
@@ -56,9 +64,9 @@ node dist/server/index.mjs
 
 ## Notes
 
-- The app uses `offline_access` scope to persist sessions across browser restarts
-- Bike API data is fetched server-side to avoid CORS restrictions from `api.bosch-ebike.com`
-- Tokens are stored in `sessionStorage` — cleared on tab close unless `offline_access` refresh token is used
+- Uses `offline_access` scope to persist sessions across browser restarts via refresh token
+- Before data appears, enable third-party app access at [flow.bosch-ebike.com/data-act](https://flow.bosch-ebike.com/data-act)
+- Heatmap requires activity GPS traces — not all activities include them
 
 ## Framework docs
 
