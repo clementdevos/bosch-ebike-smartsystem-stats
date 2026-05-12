@@ -2,6 +2,7 @@
   "name": "bosch-ebike-smartsystem-stats",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.1.1",
   "imports": {
     "#/*": "./src/*"
   },
@@ -18,14 +19,14 @@
   "dependencies": {
     "@radix-ui/react-slider": "^1.3.6",
     "@tailwindcss/vite": "^4.1.18",
-    "@tanstack/react-query": "latest",
-    "@tanstack/react-devtools": "latest",
-    "@tanstack/react-router": "latest",
-    "@tanstack/react-router-devtools": "latest",
-    "@tanstack/react-router-ssr-query": "latest",
-    "@tanstack/react-start": "latest",
+    "@tanstack/react-devtools": "^0.10.3",
+    "@tanstack/react-query": "^5.100.10",
+    "@tanstack/react-router": "^1.169.2",
+    "@tanstack/react-router-devtools": "^1.166.13",
+    "@tanstack/react-router-ssr-query": "^1.166.12",
+    "@tanstack/react-start": "^1.167.65",
     "@tanstack/react-table": "^8.21.3",
-    "@tanstack/router-plugin": "^1.132.0",
+    "@tanstack/router-plugin": "^1.167.35",
     "@types/leaflet": "^1.9.21",
     "@types/leaflet.heat": "^0.2.5",
     "class-variance-authority": "^0.7.1",
@@ -46,7 +47,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/typography": "^0.5.16",
-    "@tanstack/devtools-vite": "latest",
+    "@tanstack/devtools-vite": "^0.6.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^22.10.2",
@@ -64,6 +65,7 @@
     "vitest": "^4.1.5"
   },
   "pnpm": {
+    "minimumReleaseAge": 2880,
     "onlyBuiltDependencies": [
       "esbuild",
       "lightningcss"
