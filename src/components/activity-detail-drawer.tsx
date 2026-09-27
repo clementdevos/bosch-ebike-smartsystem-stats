@@ -1,6 +1,7 @@
 import { useState, useMemo, memo, lazy, Suspense } from 'react'
 import { useActivityDetails } from './data/use-activity-details'
-import { X } from 'lucide-react'
+import { X, Download } from 'lucide-react'
+import { toGpx, toActivityJson, downloadFile } from '../lib/export'
 import {
   AreaChart,
   Area,
@@ -133,6 +134,11 @@ const MiniChart = memo(function MiniChart({
   )
 })
 
+function exportFileName(summary: ActivitySummary, ext: string) {
+  const date = summary.startTime.slice(0, 10)
+  return `activity-${date}-${summary.id}.${ext}`
+}
+
 const RESOLUTION_STEPS = [1, 10, 20, 30, 40, 50, 60, 90, 120]
 const DEFAULT_RES = 10
 
@@ -165,6 +171,30 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
             <DrawerDescription>{summary ? fmtDate(summary.startTime) : ''}</DrawerDescription>
           </div>
           <div className="flex items-center gap-2">
+            {summary && points.length > 0 && (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => downloadFile(exportFileName(summary, 'gpx'), toGpx(summary, points), 'application/gpx+xml')}
+                  className="hover:bg-muted flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs"
+                >
+                  <Download className="h-3 w-3" />
+                  GPX
+                </button>
+                <button
+                  onClick={() =>
+                    downloadFile(
+                      exportFileName(summary, 'json'),
+                      toActivityJson(summary, points),
+                      'application/json',
+                    )
+                  }
+                  className="hover:bg-muted flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs"
+                >
+                  <Download className="h-3 w-3" />
+                  JSON
+                </button>
+              </div>
+            )}
             {points.length > 0 && (
               <div className="flex items-center gap-1.5">
                 <label className="text-muted-foreground text-xs">Res</label>
