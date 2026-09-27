@@ -47,10 +47,10 @@ After sign-in, the access and refresh tokens are stored in an **encrypted, HttpO
 ## Setup
 
 ```bash
-npm install
+pnpm install
 ```
 
-Create `.env.local`:
+Create `.env.local` **in the repo root**:
 
 ```env
 VITE_BOSCH_CLIENT_ID=your-client-id-here
@@ -62,7 +62,7 @@ SESSION_SECRET=a-random-string-of-at-least-32-characters
 Register `https://localhost:8080/callback` as an allowed redirect URI in your Bosch EUDA client registration.
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 App runs at `https://localhost:8080` (self-signed cert — accept the browser warning).
@@ -70,9 +70,15 @@ App runs at `https://localhost:8080` (self-signed cert — accept the browser wa
 ## Build
 
 ```bash
-npm run build
-node dist/server/index.mjs
+pnpm build
+PORT=8080 pnpm start
 ```
+
+- `VITE_BOSCH_CLIENT_ID` is baked into the client bundle at **build time** — `.env.local` must exist when you run `pnpm build`.
+- `SESSION_SECRET` is read at **runtime** by the server — `pnpm start` loads it from `.env.local` via Node's `--env-file`. Running the built server elsewhere (no `.env.local` present)? Pass it directly: `SESSION_SECRET=... PORT=8080 node .output/server/index.mjs`.
+- `pnpm build` outputs the server to `.output/server/index.mjs` (not `dist/`). `.output/` starts with a dot — it won't show in a plain `ls`, use `ls -a`.
+- The server listens on `PORT` (default `3000` if unset).
+- Redirect URI is `https://<host>/callback` — whatever origin you deploy to must also be registered with Bosch, and must be served over HTTPS (the session cookie is `Secure`).
 
 ## Notes
 
