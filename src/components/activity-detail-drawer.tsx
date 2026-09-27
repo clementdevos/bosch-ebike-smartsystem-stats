@@ -228,11 +228,16 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
         </DrawerHeader>
 
         {summary && (
-          <div className="grid grid-cols-4 gap-2 border-b px-4 py-2 text-center text-sm sm:grid-cols-4">
+          <div className="grid grid-cols-4 gap-2 border-b px-4 py-2 text-center text-sm">
             <Stat label="Distance" value={`${(summary.distance / 1000).toFixed(1)} km`} />
             <Stat label="Duration" value={fmt(summary.durationWithoutStops)} />
             <Stat label="Avg speed" value={`${summary.speed.average.toFixed(1)} km/h`} />
+            <Stat label="Max speed" value={`${summary.speed.maximum.toFixed(1)} km/h`} />
             <Stat label="Elev gain" value={`${summary.elevation.gain} m`} />
+            <Stat label="Elev loss" value={`${summary.elevation.loss} m`} />
+            {summary.caloriesBurned != null && (
+              <Stat label="Calories" value={`${Math.round(summary.caloriesBurned)} kcal`} />
+            )}
           </div>
         )}
 

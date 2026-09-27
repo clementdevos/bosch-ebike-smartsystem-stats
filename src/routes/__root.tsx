@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { AuthProvider, useAuth } from '../lib/auth-context'
 import { BikeSelectionProvider } from '../lib/bike-selection-context'
 import { Button } from '../components/ui/button'
-import { Bike, Flame, ListChecks } from 'lucide-react'
+import { Bike, Flame, ListChecks, BarChart3 } from 'lucide-react'
 
 import appCss from '../styles.css?url'
 
@@ -37,7 +37,10 @@ function RootLayout() {
       {/* Desktop nav — hidden below 500px */}
       <nav className="sticky top-0 z-10 hidden items-center gap-6 border-b border-[var(--line)] bg-[var(--header-bg)] px-8 py-3 text-sm font-medium backdrop-blur-sm min-[500px]:flex">
         <Link to="/" className={navLinkClass}>
-          Bikes
+          Stats
+        </Link>
+        <Link to="/garage" className={navLinkClass}>
+          Garage
         </Link>
         <Link to="/activities" search={{ activityId: undefined }} className={navLinkClass}>
           Activities
@@ -105,8 +108,15 @@ function RootLayout() {
           to="/"
           className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] text-slate-500 [&.active]:text-indigo-600"
         >
+          <BarChart3 className="size-5" />
+          Stats
+        </Link>
+        <Link
+          to="/garage"
+          className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] text-slate-500 [&.active]:text-indigo-600"
+        >
           <Bike className="size-5" />
-          Bikes
+          Garage
         </Link>
         <Link
           to="/activities"

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as HeatmapRouteImport } from './routes/heatmap'
+import { Route as GarageRouteImport } from './routes/garage'
 import { Route as CallbackRouteImport } from './routes/callback'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +24,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const HeatmapRoute = HeatmapRouteImport.update({
   id: '/heatmap',
   path: '/heatmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GarageRoute = GarageRouteImport.update({
+  id: '/garage',
+  path: '/garage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CallbackRoute = CallbackRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
   '/callback': typeof CallbackRoute
+  '/garage': typeof GarageRoute
   '/heatmap': typeof HeatmapRoute
   '/privacy': typeof PrivacyRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
   '/callback': typeof CallbackRoute
+  '/garage': typeof GarageRoute
   '/heatmap': typeof HeatmapRoute
   '/privacy': typeof PrivacyRoute
 }
@@ -60,21 +68,36 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
   '/callback': typeof CallbackRoute
+  '/garage': typeof GarageRoute
   '/heatmap': typeof HeatmapRoute
   '/privacy': typeof PrivacyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/activities' | '/callback' | '/heatmap' | '/privacy'
+  fullPaths:
+    | '/'
+    | '/activities'
+    | '/callback'
+    | '/garage'
+    | '/heatmap'
+    | '/privacy'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/activities' | '/callback' | '/heatmap' | '/privacy'
-  id: '__root__' | '/' | '/activities' | '/callback' | '/heatmap' | '/privacy'
+  to: '/' | '/activities' | '/callback' | '/garage' | '/heatmap' | '/privacy'
+  id:
+    | '__root__'
+    | '/'
+    | '/activities'
+    | '/callback'
+    | '/garage'
+    | '/heatmap'
+    | '/privacy'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivitiesRoute: typeof ActivitiesRoute
   CallbackRoute: typeof CallbackRoute
+  GarageRoute: typeof GarageRoute
   HeatmapRoute: typeof HeatmapRoute
   PrivacyRoute: typeof PrivacyRoute
 }
@@ -93,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/heatmap'
       fullPath: '/heatmap'
       preLoaderRoute: typeof HeatmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/garage': {
+      id: '/garage'
+      path: '/garage'
+      fullPath: '/garage'
+      preLoaderRoute: typeof GarageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/callback': {
@@ -123,6 +153,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivitiesRoute: ActivitiesRoute,
   CallbackRoute: CallbackRoute,
+  GarageRoute: GarageRoute,
   HeatmapRoute: HeatmapRoute,
   PrivacyRoute: PrivacyRoute,
 }

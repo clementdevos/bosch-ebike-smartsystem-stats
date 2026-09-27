@@ -14,6 +14,7 @@ import { type ActivitySummary } from '../server/activities'
 import type { Bike } from '../server/bikes'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
+import { Input } from './ui/input'
 
 interface Props {
   activities: ActivitySummary[]
@@ -98,9 +99,27 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
   )
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'startTime', desc: true }])
+  const [search, setSearch] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+
+  const filteredActivities = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    const fromTs = dateFrom ? new Date(dateFrom).getTime() : null
+    const toTs = dateTo ? new Date(dateTo).getTime() + 86_400_000 : null
+    return activities.filter((a) => {
+      if (query && !(a.title ?? '').toLowerCase().includes(query)) return false
+      const t = new Date(a.startTime).getTime()
+      if (fromTs !== null && t < fromTs) return false
+      if (toTs !== null && t > toTs) return false
+      return true
+    })
+  }, [activities, search, dateFrom, dateTo])
+
+  const isFiltered = !!search || !!dateFrom || !!dateTo
 
   const table = useReactTable({
-    data: activities,
+    data: filteredActivities,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -112,10 +131,46 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="gap-4">
         <CardTitle className="text-base font-semibold">
-          {activities.length} of {total} activit{total === 1 ? 'y' : 'ies'}
+          {isFiltered
+            ? `${filteredActivities.length} of ${activities.length} loaded activities match`
+            : `${activities.length} of ${total} activit${total === 1 ? 'y' : 'ies'}`}
         </CardTitle>
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            placeholder="Search title…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-48"
+          />
+          <Input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="w-auto"
+          />
+          <span className="text-xs text-gray-400">to</span>
+          <Input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="w-auto"
+          />
+          {isFiltered && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSearch('')
+                setDateFrom('')
+                setDateTo('')
+              }}
+            >
+              Clear
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
