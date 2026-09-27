@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { AuthProvider, useAuth } from '../lib/auth-context'
 import { BikeSelectionProvider } from '../lib/bike-selection-context'
 import { Button } from '../components/ui/button'
-import { Bike, Flame, ListChecks, BarChart3 } from 'lucide-react'
+import { Bike, Flame, ListChecks, BarChart3, Home } from 'lucide-react'
 
 import appCss from '../styles.css?url'
 
@@ -36,7 +36,12 @@ function RootLayout() {
     <div className="flex min-h-screen flex-col">
       {/* Desktop nav — hidden below 500px */}
       <nav className="sticky top-0 z-10 hidden items-center gap-6 border-b border-[var(--line)] bg-[var(--header-bg)] px-8 py-3 text-sm font-medium backdrop-blur-sm min-[500px]:flex">
-        <Link to="/" search={{ activityId: undefined }} className={navLinkClass}>
+        <Link
+          to="/"
+          search={{ activityId: undefined }}
+          className={`flex items-center gap-1.5 ${navLinkClass}`}
+        >
+          <Home className="size-4" />
           Stats
         </Link>
         <Link to="/garage" className={navLinkClass}>
@@ -72,7 +77,7 @@ function RootLayout() {
         )}
       </div>
 
-      <main className="flex-1 min-[500px]:pb-0 pb-[60px]">
+      <main className="flex-1 pb-[60px] min-[500px]:pb-0">
         <Outlet />
       </main>
 
@@ -103,7 +108,7 @@ function RootLayout() {
       </footer>
 
       {/* Mobile bottom tab nav — visible below 500px */}
-      <nav className="fixed bottom-0 left-0 right-0 z-10 flex border-t border-[var(--line)] bg-[var(--header-bg)] backdrop-blur-sm min-[500px]:hidden">
+      <nav className="fixed right-0 bottom-0 left-0 z-10 flex border-t border-[var(--line)] bg-[var(--header-bg)] backdrop-blur-sm min-[500px]:hidden">
         <Link
           to="/"
           search={{ activityId: undefined }}
