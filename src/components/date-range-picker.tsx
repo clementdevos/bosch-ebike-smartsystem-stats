@@ -8,6 +8,7 @@ import {
   endOfDay,
   localDateInputValue,
   parseLocalDateInput,
+  normalizeRange,
   ALL_TIME,
   type DateRange,
   type PresetKey,
@@ -35,7 +36,9 @@ function isAllTime(r: DateRange) {
 }
 
 function triggerLabel(range: DateRange, presetKey: PresetKey | null) {
-  if (isAllTime(range)) return 'All time'
+  if (isAllTime(range)) {
+    return 'All time'
+  }
   const preset = presetKey ? PRESETS.find((p) => p.key === presetKey) : null
   const span = `${range.from !== null ? fmtShort(range.from) : '…'} – ${range.to !== null ? fmtShort(range.to) : '…'}`
   return preset ? `${preset.label} · ${span}` : span
@@ -81,7 +84,9 @@ function MonthGrid({
       </div>
       <div className="grid grid-cols-7 gap-y-1 text-center text-xs">
         {cells.map((day, i) => {
-          if (day === null) return <span key={i} />
+          if (day === null) {
+            return <span key={i} />
+          }
           const dayStart = new Date(year, month, day).getTime()
           const dayEnd = dayStart + DAY_MS - 1
           const from = pendingFrom ?? draftRange.from
@@ -124,14 +129,18 @@ export function DateRangePicker() {
   })
 
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      return
+    }
     function onPointerDown(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false)
       }
     }
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
     }
     document.addEventListener('mousedown', onPointerDown)
     document.addEventListener('keydown', onKeyDown)
@@ -271,8 +280,11 @@ export function DateRangePicker() {
                 value={localDateInputValue(draftRange.from)}
                 onChange={(e) => {
                   setDraftPreset(null)
+                  setPendingFrom(null)
                   const d = parseLocalDateInput(e.target.value)
-                  setDraftRange((r) => ({ ...r, from: d ? startOfDay(d).getTime() : null }))
+                  setDraftRange((r) =>
+                    normalizeRange({ ...r, from: d ? startOfDay(d).getTime() : null })
+                  )
                 }}
                 className="w-auto"
               />
@@ -282,8 +294,11 @@ export function DateRangePicker() {
                 value={localDateInputValue(draftRange.to)}
                 onChange={(e) => {
                   setDraftPreset(null)
+                  setPendingFrom(null)
                   const d = parseLocalDateInput(e.target.value)
-                  setDraftRange((r) => ({ ...r, to: d ? endOfDay(d).getTime() : null }))
+                  setDraftRange((r) =>
+                    normalizeRange({ ...r, to: d ? endOfDay(d).getTime() : null })
+                  )
                 }}
                 className="w-auto"
               />

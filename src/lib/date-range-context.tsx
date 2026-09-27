@@ -5,7 +5,6 @@ interface DateRangeContextValue {
   range: DateRange
   presetKey: PresetKey | null
   setRange: (range: DateRange, presetKey?: PresetKey | null) => void
-  clearRange: () => void
 }
 
 const DateRangeContext = createContext<DateRangeContextValue | null>(null)
@@ -19,13 +18,8 @@ export function DateRangeProvider({ children }: { children: ReactNode }) {
     setPresetKey(preset)
   }, [])
 
-  const clearRange = useCallback(() => {
-    setRangeState(ALL_TIME)
-    setPresetKey(null)
-  }, [])
-
   return (
-    <DateRangeContext.Provider value={{ range, presetKey, setRange, clearRange }}>
+    <DateRangeContext.Provider value={{ range, presetKey, setRange }}>
       {children}
     </DateRangeContext.Provider>
   )
@@ -33,6 +27,8 @@ export function DateRangeProvider({ children }: { children: ReactNode }) {
 
 export function useDateRange() {
   const ctx = useContext(DateRangeContext)
-  if (!ctx) throw new Error('useDateRange must be used within DateRangeProvider')
+  if (!ctx) {
+    throw new Error('useDateRange must be used within DateRangeProvider')
+  }
   return ctx
 }

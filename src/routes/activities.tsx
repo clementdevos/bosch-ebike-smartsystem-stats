@@ -6,8 +6,7 @@ import { useBikes } from '../components/data/use-bikes'
 import { useActivities } from '../components/data/use-activities'
 import { ActivityDetailDrawer } from '../components/activity-detail-drawer'
 import { useBikeSelection } from '../lib/bike-selection-context'
-import { useDateRange } from '../lib/date-range-context'
-import { isWithinRange } from '../lib/date-range'
+import { useDateFilteredActivities } from '../lib/use-date-filtered-activities'
 import { ActivitiesHeader } from '../components/activities-header'
 import { OdometerChart } from '../components/odometer-chart'
 import { ActivitiesTable } from '../components/activities-table'
@@ -80,7 +79,6 @@ export default function ActivitiesPage() {
   const { activityId } = Route.useSearch()
   const navigate = useNavigate({ from: '/activities' })
   const { enabledBikeIds, enableAll } = useBikeSelection()
-  const { range } = useDateRange()
 
   const { data: bikeData } = useBikes()
   const bikes = useMemo(() => bikeData?.bikes ?? [], [bikeData])
@@ -123,10 +121,7 @@ export default function ActivitiesPage() {
 
   const uniqueBikeIds = useMemo(() => [...new Set(activities.map((a) => a.bikeId))], [activities])
 
-  const dateFilteredActivities = useMemo(
-    () => activities.filter((a) => isWithinRange(a.startTime, range)),
-    [activities, range]
-  )
+  const dateFilteredActivities = useDateFilteredActivities(activities)
 
   const filteredActivities = useMemo(
     () => dateFilteredActivities.filter((a) => enabledBikeIds.has(a.bikeId)),

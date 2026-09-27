@@ -101,13 +101,17 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
   const [sorting, setSorting] = useState<SortingState>([{ id: 'startTime', desc: true }])
   const [search, setSearch] = useState('')
 
-  const filteredActivities = useMemo(() => {
-    const query = search.trim().toLowerCase()
-    if (!query) return activities
-    return activities.filter((a) => (a.title ?? '').toLowerCase().includes(query))
-  }, [activities, search])
+  const trimmedSearch = search.trim()
 
-  const isFiltered = !!search
+  const filteredActivities = useMemo(() => {
+    const query = trimmedSearch.toLowerCase()
+    if (!query) {
+      return activities
+    }
+    return activities.filter((a) => (a.title ?? '').toLowerCase().includes(query))
+  }, [activities, trimmedSearch])
+
+  const isFiltered = !!trimmedSearch
 
   const table = useReactTable({
     data: filteredActivities,

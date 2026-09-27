@@ -5,7 +5,7 @@ import { useActivities } from './data/use-activities'
 import { fetchActivityDetails, type ActivityDetailPoint } from '../server/activities'
 import { useBikeSelection } from '../lib/bike-selection-context'
 import { useDateRange } from '../lib/date-range-context'
-import { isWithinRange } from '../lib/date-range'
+import { useDateFilteredActivities } from '../lib/use-date-filtered-activities'
 import { DateRangePicker } from './date-range-picker'
 import { Slider } from './ui/slider'
 import { Button } from './ui/button'
@@ -75,19 +75,16 @@ export function HeatmapTab() {
     [allActivities, enabledBikeIds]
   )
 
-  const dateFilteredActivities = useMemo(
-    () => bikeActivities.filter((a) => isWithinRange(a.startTime, range)),
-    [bikeActivities, range]
-  )
+  const dateFilteredActivities = useDateFilteredActivities(bikeActivities)
 
   const [sampleSize, setSampleSize] = useState(50)
-  // Reset to a fresh default whenever the shared date range changes, rather
-  // than only ever shrinking — otherwise a narrow range followed by a wider
-  // one leaves the sample stuck at whatever it shrank to.
+  // Reset to a fresh default whenever the date range or bike selection
+  // changes, rather than only ever shrinking — otherwise a narrow selection
+  // followed by a wider one leaves the sample stuck at whatever it shrank to.
   useEffect(() => {
     setSampleSize(Math.max(1, Math.min(50, dateFilteredActivities.length || 1)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [range])
+  }, [range, enabledBikeIds])
 
   const [resolution, setResolution] = useState(DEFAULT_RES)
 

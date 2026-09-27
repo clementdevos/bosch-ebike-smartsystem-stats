@@ -27,62 +27,83 @@ export interface ActivityRecord {
   value: string
 }
 
-function best(
-  activities: ActivitySummary[],
+interface RecordTracker {
+  longestDistance: ActivitySummary | null
+  fastestAvgSpeed: ActivitySummary | null
+  mostElevationGain: ActivitySummary | null
+  mostCalories: ActivitySummary | null
+  longestDuration: ActivitySummary | null
+}
+
+function keepBest(
+  current: ActivitySummary | null,
+  candidate: ActivitySummary,
   by: (a: ActivitySummary) => number
-): ActivitySummary | null {
-  return activities.reduce<ActivitySummary | null>(
-    (top, a) => (top === null || by(a) > by(top) ? a : top),
-    null
-  )
+): ActivitySummary {
+  if (current === null || by(candidate) > by(current)) {
+    return candidate
+  }
+  return current
 }
 
 export function computeRecords(activities: ActivitySummary[]): ActivityRecord[] {
+  const best = activities.reduce<RecordTracker>(
+    (acc, a) => ({
+      longestDistance: keepBest(acc.longestDistance, a, (x) => x.distance),
+      fastestAvgSpeed: keepBest(acc.fastestAvgSpeed, a, (x) => x.speed.average),
+      mostElevationGain: keepBest(acc.mostElevationGain, a, (x) => x.elevation.gain),
+      mostCalories: keepBest(acc.mostCalories, a, (x) => x.caloriesBurned ?? 0),
+      longestDuration: keepBest(acc.longestDuration, a, (x) => x.durationWithoutStops),
+    }),
+    {
+      longestDistance: null,
+      fastestAvgSpeed: null,
+      mostElevationGain: null,
+      mostCalories: null,
+      longestDuration: null,
+    }
+  )
+
   const records: ActivityRecord[] = []
 
-  const longest = best(activities, (a) => a.distance)
-  if (longest) {
+  if (best.longestDistance) {
     records.push({
       label: 'Longest ride',
-      activity: longest,
-      value: `${(longest.distance / 1000).toFixed(1)} km`,
+      activity: best.longestDistance,
+      value: `${(best.longestDistance.distance / 1000).toFixed(1)} km`,
     })
   }
 
-  const fastest = best(activities, (a) => a.speed.average)
-  if (fastest) {
+  if (best.fastestAvgSpeed) {
     records.push({
       label: 'Fastest avg speed',
-      activity: fastest,
-      value: `${fastest.speed.average.toFixed(1)} km/h`,
+      activity: best.fastestAvgSpeed,
+      value: `${best.fastestAvgSpeed.speed.average.toFixed(1)} km/h`,
     })
   }
 
-  const mostClimb = best(activities, (a) => a.elevation.gain)
-  if (mostClimb) {
+  if (best.mostElevationGain) {
     records.push({
       label: 'Most elevation gain',
-      activity: mostClimb,
-      value: `${mostClimb.elevation.gain} m`,
+      activity: best.mostElevationGain,
+      value: `${best.mostElevationGain.elevation.gain} m`,
     })
   }
 
-  const mostCalories = best(activities, (a) => a.caloriesBurned ?? 0)
-  if (mostCalories && (mostCalories.caloriesBurned ?? 0) > 0) {
+  if (best.mostCalories && (best.mostCalories.caloriesBurned ?? 0) > 0) {
     records.push({
       label: 'Most calories burned',
-      activity: mostCalories,
-      value: `${Math.round(mostCalories.caloriesBurned!)} kcal`,
+      activity: best.mostCalories,
+      value: `${Math.round(best.mostCalories.caloriesBurned!)} kcal`,
     })
   }
 
-  const longestDuration = best(activities, (a) => a.durationWithoutStops)
-  if (longestDuration) {
-    const h = Math.floor(longestDuration.durationWithoutStops / 3600)
-    const m = Math.floor((longestDuration.durationWithoutStops % 3600) / 60)
+  if (best.longestDuration) {
+    const h = Math.floor(best.longestDuration.durationWithoutStops / 3600)
+    const m = Math.floor((best.longestDuration.durationWithoutStops % 3600) / 60)
     records.push({
       label: 'Longest duration',
-      activity: longestDuration,
+      activity: best.longestDuration,
       value: h > 0 ? `${h}h ${m}m` : `${m}m`,
     })
   }

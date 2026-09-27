@@ -2,15 +2,16 @@ import { describe, it, expect } from 'vitest'
 import {
   presetRange,
   isWithinRange,
+  normalizeRange,
   localDateInputValue,
   parseLocalDateInput,
+  endOfDay,
   ALL_TIME,
 } from './date-range'
 
 // Local time, deliberately — presets like "month to date" mean the user's
 // calendar month, not the UTC one.
 const NOW = new Date(2026, 2, 15, 12, 0, 0)
-const DAY_MS = 86_400_000
 
 describe('presetRange', () => {
   it('today spans midnight to end of today', () => {
@@ -25,11 +26,10 @@ describe('presetRange', () => {
     expect(r.to).toBe(new Date(2026, 2, 15, 0, 0, 0).getTime() - 1)
   })
 
-  it('7d covers the trailing week including today', () => {
+  it('7d covers today plus the 6 preceding calendar days', () => {
     const r = presetRange('7d', NOW)
-    const todayEnd = new Date(2026, 2, 16, 0, 0, 0).getTime() - 1
-    expect(r.to).toBe(todayEnd)
-    expect(r.from).toBe(todayEnd - 7 * DAY_MS + 1)
+    expect(r.to).toBe(new Date(2026, 2, 16, 0, 0, 0).getTime() - 1)
+    expect(r.from).toBe(new Date(2026, 2, 9, 0, 0, 0).getTime())
   })
 
   it('mtd starts on the 1st of the current month', () => {
@@ -46,6 +46,31 @@ describe('presetRange', () => {
     const r = presetRange('today', NOW)
     const laterToday = new Date(2026, 2, 15, 23, 30, 0).toISOString()
     expect(isWithinRange(laterToday, r)).toBe(true)
+  })
+})
+
+describe('endOfDay', () => {
+  it('lands exactly 1ms before local midnight of the next calendar day', () => {
+    const d = new Date(2026, 2, 15, 10, 0, 0)
+    const nextMidnight = new Date(2026, 2, 16, 0, 0, 0)
+    expect(endOfDay(d).getTime()).toBe(nextMidnight.getTime() - 1)
+  })
+})
+
+describe('normalizeRange', () => {
+  it('swaps from/to when out of order', () => {
+    const r = normalizeRange({ from: 200, to: 100 })
+    expect(r).toEqual({ from: 100, to: 200 })
+  })
+
+  it('leaves an already-ordered range untouched', () => {
+    const r = normalizeRange({ from: 100, to: 200 })
+    expect(r).toEqual({ from: 100, to: 200 })
+  })
+
+  it('leaves a range with an open bound untouched', () => {
+    expect(normalizeRange({ from: null, to: 200 })).toEqual({ from: null, to: 200 })
+    expect(normalizeRange({ from: 100, to: null })).toEqual({ from: 100, to: null })
   })
 })
 
