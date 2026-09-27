@@ -21,6 +21,7 @@ import {
 } from '#/components/ui/drawer'
 import { type ActivityDetailPoint } from '../server/activities'
 import type { ActivitySummary } from '../server/activities'
+import { Skeleton } from '#/components/ui/skeleton'
 
 const ActivityMap = lazy(() => import('./activity-map').then((m) => ({ default: m.ActivityMap })))
 
@@ -250,8 +251,9 @@ export function ActivityDetailDrawer({ summary, onClose }: Props) {
 
         <div className="flex-1 space-y-6 overflow-y-auto px-4 py-4">
           {loading && (
-            <div className="text-muted-foreground flex h-24 items-center justify-center text-sm">
-              Loading detail data…
+            <div className="space-y-6 pb-6">
+              <Skeleton className="h-40 w-full" />
+              <Skeleton className="h-40 w-full" />
             </div>
           )}
           {error && (

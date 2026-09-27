@@ -6,6 +6,7 @@ import {fetchActivityDetails, type ActivityDetailPoint} from '../server/activiti
 import {useBikeSelection} from '../lib/bike-selection-context'
 import {Slider} from './ui/slider'
 import {Button} from './ui/button'
+import {Skeleton} from './ui/skeleton'
 
 type HeatPoint = [number, number, number]
 
@@ -150,6 +151,13 @@ export function HeatmapTab() {
                             ? 'No activities loaded.'
                             : `${loadedResults.length} activities · ${heatPoints.length} pts`}
                 </p>
+                {isLoadingActivities && (
+                    <div className="w-full space-y-4">
+                        <Skeleton className="h-5 w-full"/>
+                        <Skeleton className="h-5 w-full"/>
+                        <Skeleton className="h-[480px] w-full rounded-lg"/>
+                    </div>
+                )}
                 {hasNextPage && (
                     <Button
                         variant="outline"
