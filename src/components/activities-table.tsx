@@ -100,23 +100,14 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'startTime', desc: true }])
   const [search, setSearch] = useState('')
-  const [dateFrom, setDateFrom] = useState('')
-  const [dateTo, setDateTo] = useState('')
 
   const filteredActivities = useMemo(() => {
     const query = search.trim().toLowerCase()
-    const fromTs = dateFrom ? new Date(dateFrom).getTime() : null
-    const toTs = dateTo ? new Date(dateTo).getTime() + 86_400_000 : null
-    return activities.filter((a) => {
-      if (query && !(a.title ?? '').toLowerCase().includes(query)) return false
-      const t = new Date(a.startTime).getTime()
-      if (fromTs !== null && t < fromTs) return false
-      if (toTs !== null && t > toTs) return false
-      return true
-    })
-  }, [activities, search, dateFrom, dateTo])
+    if (!query) return activities
+    return activities.filter((a) => (a.title ?? '').toLowerCase().includes(query))
+  }, [activities, search])
 
-  const isFiltered = !!search || !!dateFrom || !!dateTo
+  const isFiltered = !!search
 
   const table = useReactTable({
     data: filteredActivities,
@@ -144,29 +135,8 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
             onChange={(e) => setSearch(e.target.value)}
             className="max-w-48"
           />
-          <Input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="w-auto"
-          />
-          <span className="text-xs text-gray-400">to</span>
-          <Input
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="w-auto"
-          />
           {isFiltered && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSearch('')
-                setDateFrom('')
-                setDateTo('')
-              }}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setSearch('')}>
               Clear
             </Button>
           )}

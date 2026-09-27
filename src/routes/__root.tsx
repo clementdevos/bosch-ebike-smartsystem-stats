@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
 import { AuthProvider, useAuth } from '../lib/auth-context'
 import { BikeSelectionProvider } from '../lib/bike-selection-context'
+import { DateRangeProvider } from '../lib/date-range-context'
 import { Button } from '../components/ui/button'
 import { Bike, Flame, ListChecks, BarChart3, Home } from 'lucide-react'
 
@@ -160,7 +161,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <BikeSelectionProvider>{children}</BikeSelectionProvider>
+            <BikeSelectionProvider>
+              <DateRangeProvider>{children}</DateRangeProvider>
+            </BikeSelectionProvider>
           </AuthProvider>
         </QueryClientProvider>
         <TanStackDevtools

@@ -6,6 +6,8 @@ import { useBikes } from '../components/data/use-bikes'
 import { useActivities } from '../components/data/use-activities'
 import { ActivityDetailDrawer } from '../components/activity-detail-drawer'
 import { useBikeSelection } from '../lib/bike-selection-context'
+import { useDateRange } from '../lib/date-range-context'
+import { isWithinRange } from '../lib/date-range'
 import { ActivitiesHeader } from '../components/activities-header'
 import { OdometerChart } from '../components/odometer-chart'
 import { ActivitiesTable } from '../components/activities-table'
@@ -78,6 +80,7 @@ export default function ActivitiesPage() {
   const { activityId } = Route.useSearch()
   const navigate = useNavigate({ from: '/activities' })
   const { enabledBikeIds, enableAll } = useBikeSelection()
+  const { range } = useDateRange()
 
   const { data: bikeData } = useBikes()
   const bikes = useMemo(() => bikeData?.bikes ?? [], [bikeData])
@@ -120,9 +123,14 @@ export default function ActivitiesPage() {
 
   const uniqueBikeIds = useMemo(() => [...new Set(activities.map((a) => a.bikeId))], [activities])
 
+  const dateFilteredActivities = useMemo(
+    () => activities.filter((a) => isWithinRange(a.startTime, range)),
+    [activities, range]
+  )
+
   const filteredActivities = useMemo(
-    () => activities.filter((a) => enabledBikeIds.has(a.bikeId)),
-    [activities, enabledBikeIds]
+    () => dateFilteredActivities.filter((a) => enabledBikeIds.has(a.bikeId)),
+    [dateFilteredActivities, enabledBikeIds]
   )
 
   const bikeName = useCallback(
@@ -139,8 +147,8 @@ export default function ActivitiesPage() {
   )
 
   const chartData = useMemo(
-    () => buildChartData(activities, enabledBikeIds),
-    [activities, enabledBikeIds]
+    () => buildChartData(dateFilteredActivities, enabledBikeIds),
+    [dateFilteredActivities, enabledBikeIds]
   )
 
   const selectedActivity = useMemo(
@@ -222,7 +230,9 @@ export default function ActivitiesPage() {
         )}
       </div>
 
-      {isAuthenticated && <ActivityDetailDrawer summary={selectedActivity} onClose={closeActivity} />}
+      {isAuthenticated && (
+        <ActivityDetailDrawer summary={selectedActivity} onClose={closeActivity} />
+      )}
     </>
   )
 }
