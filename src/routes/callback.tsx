@@ -10,7 +10,7 @@ function Callback() {
 
   useEffect(() => {
     if (!isLoading) {
-      navigate({ to: '/' })
+      navigate({ to: '/', search: { activityId: undefined } })
     }
   }, [isLoading, navigate])
 

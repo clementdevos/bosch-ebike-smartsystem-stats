@@ -36,7 +36,7 @@ function RootLayout() {
     <div className="flex min-h-screen flex-col">
       {/* Desktop nav — hidden below 500px */}
       <nav className="sticky top-0 z-10 hidden items-center gap-6 border-b border-[var(--line)] bg-[var(--header-bg)] px-8 py-3 text-sm font-medium backdrop-blur-sm min-[500px]:flex">
-        <Link to="/" className={navLinkClass}>
+        <Link to="/" search={{ activityId: undefined }} className={navLinkClass}>
           Stats
         </Link>
         <Link to="/garage" className={navLinkClass}>
@@ -106,6 +106,7 @@ function RootLayout() {
       <nav className="fixed bottom-0 left-0 right-0 z-10 flex border-t border-[var(--line)] bg-[var(--header-bg)] backdrop-blur-sm min-[500px]:hidden">
         <Link
           to="/"
+          search={{ activityId: undefined }}
           className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] text-slate-500 [&.active]:text-indigo-600"
         >
           <BarChart3 className="size-5" />

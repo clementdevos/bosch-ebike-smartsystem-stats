@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '../lib/auth-context'
 import { useActivities } from '../components/data/use-activities'
@@ -6,11 +6,17 @@ import { useBikes } from '../components/data/use-bikes'
 import { useBikeSelection } from '../lib/bike-selection-context'
 import { computeTotals, computeRecords } from '../lib/activity-stats'
 import { ActivitiesHeader } from '../components/activities-header'
+import { ActivityDetailDrawer } from '../components/activity-detail-drawer'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Skeleton } from '../components/ui/skeleton'
 import { Button } from '../components/ui/button'
 
-export const Route = createFileRoute('/')({ component: StatsPage })
+export const Route = createFileRoute('/')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    activityId: typeof search.activityId === 'string' ? search.activityId : undefined,
+  }),
+  component: StatsPage,
+})
 
 const PRELOAD_TARGET = 50
 
@@ -56,6 +62,8 @@ function StatTile({ label, value }: { label: string; value: string }) {
 
 function StatsPage() {
   const { isAuthenticated, login, isLoading: authLoading } = useAuth()
+  const { activityId } = Route.useSearch()
+  const navigate = useNavigate({ from: '/' })
   const { enabledBikeIds, enableAll } = useBikeSelection()
   const { data: bikeData } = useBikes()
   const bikes = useMemo(() => bikeData?.bikes ?? [], [bikeData])
@@ -119,6 +127,22 @@ function StatsPage() {
     return { from: Math.min(...times), to: Math.max(...times) }
   }, [filteredActivities])
 
+  const selectedActivity = useMemo(
+    () => activities.find((a) => a.id === activityId) ?? null,
+    [activities, activityId]
+  )
+
+  const openActivity = useCallback(
+    (id: string) => {
+      navigate({ search: { activityId: id } })
+    },
+    [navigate]
+  )
+
+  const closeActivity = useCallback(() => {
+    navigate({ search: { activityId: undefined } })
+  }, [navigate])
+
   if (authLoading) {
     return (
       <div className="mx-auto max-w-5xl space-y-8 p-8">
@@ -166,78 +190,79 @@ function StatsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 p-8">
-      <ActivitiesHeader
-        title="Stats"
-        uniqueBikeIds={uniqueBikeIds}
-        bikeName={bikeName}
-        initialized={initialized}
-        dataUpdatedAt={dataUpdatedAt}
-        loading={loading}
-        loadingMore={loadingMore}
-        hasMore={!!hasNextPage}
-        total={total}
-        loadedCount={activities.length}
-        onRefresh={refetch}
-        onLoadMore={fetchNextPage}
-      />
+    <>
+      <div className="mx-auto max-w-5xl space-y-8 p-8">
+        <ActivitiesHeader
+          title="Stats"
+          uniqueBikeIds={uniqueBikeIds}
+          bikeName={bikeName}
+          initialized={initialized}
+          dataUpdatedAt={dataUpdatedAt}
+          loading={loading}
+          loadingMore={loadingMore}
+          hasMore={!!hasNextPage}
+          total={total}
+          loadedCount={activities.length}
+          onRefresh={refetch}
+          onLoadMore={fetchNextPage}
+        />
 
-      {!initialized ? (
-        <StatsSkeleton />
-      ) : filteredActivities.length === 0 ? (
-        <p className="text-gray-500">No activities loaded yet.</p>
-      ) : (
-        <>
-          {dateSpan && (
-            <p className="text-sm text-gray-500">
-              {totals.count} activit{totals.count === 1 ? 'y' : 'ies'} from{' '}
-              {fmtDate(dateSpan.from)} to {fmtDate(dateSpan.to)}
-            </p>
-          )}
+        {!initialized ? (
+          <StatsSkeleton />
+        ) : filteredActivities.length === 0 ? (
+          <p className="text-gray-500">No activities loaded yet.</p>
+        ) : (
+          <>
+            {dateSpan && (
+              <p className="text-sm text-gray-500">
+                {totals.count} activit{totals.count === 1 ? 'y' : 'ies'} from{' '}
+                {fmtDate(dateSpan.from)} to {fmtDate(dateSpan.to)}
+              </p>
+            )}
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <StatTile label="Total distance" value={`${(totals.distance / 1000).toFixed(0)} km`} />
-            <StatTile label="Total time" value={fmtDuration(totals.duration)} />
-            <StatTile
-              label="Total elevation gain"
-              value={`${Math.round(totals.elevationGain)} m`}
-            />
-            <StatTile
-              label="Total calories"
-              value={totals.calories > 0 ? `${Math.round(totals.calories)} kcal` : '—'}
-            />
-          </div>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <StatTile
+                label="Total distance"
+                value={`${(totals.distance / 1000).toFixed(0)} km`}
+              />
+              <StatTile label="Total time" value={fmtDuration(totals.duration)} />
+              <StatTile
+                label="Total elevation gain"
+                value={`${Math.round(totals.elevationGain)} m`}
+              />
+              <StatTile
+                label="Total calories"
+                value={totals.calories > 0 ? `${Math.round(totals.calories)} kcal` : '—'}
+              />
+            </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Personal records</CardTitle>
-            </CardHeader>
-            <CardContent className="divide-y p-0">
-              {records.map((r) => (
-                <Link
-                  key={r.label}
-                  to="/activities"
-                  search={{ activityId: r.activity.id }}
-                  className="flex items-center justify-between px-6 py-3 text-sm hover:bg-gray-50"
-                >
-                  <div>
-                    <p className="font-medium">{r.label}</p>
-                    <p className="text-xs text-gray-500">
-                      {bikeName(r.activity.bikeId)} ·{' '}
-                      {new Date(r.activity.startTime).toLocaleDateString(undefined, {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </p>
-                  </div>
-                  <span className="font-semibold">{r.value}</span>
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
-        </>
-      )}
-    </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base font-semibold">Personal records</CardTitle>
+              </CardHeader>
+              <CardContent className="divide-y p-0">
+                {records.map((r) => (
+                  <button
+                    key={r.label}
+                    onClick={() => openActivity(r.activity.id)}
+                    className="flex w-full items-center justify-between px-6 py-3 text-left text-sm hover:bg-gray-50"
+                  >
+                    <div>
+                      <p className="font-medium">{r.label}</p>
+                      <p className="text-xs text-gray-500">
+                        {bikeName(r.activity.bikeId)} · {fmtDate(r.activity.startTime)}
+                      </p>
+                    </div>
+                    <span className="font-semibold">{r.value}</span>
+                  </button>
+                ))}
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
+
+      <ActivityDetailDrawer summary={selectedActivity} onClose={closeActivity} />
+    </>
   )
 }
