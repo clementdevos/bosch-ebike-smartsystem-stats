@@ -14,6 +14,7 @@ import { type ActivitySummary } from '../server/activities'
 import type { Bike } from '../server/bikes'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
+import { Input } from './ui/input'
 
 interface Props {
   activities: ActivitySummary[]
@@ -98,9 +99,22 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
   )
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'startTime', desc: true }])
+  const [search, setSearch] = useState('')
+
+  const trimmedSearch = search.trim()
+
+  const filteredActivities = useMemo(() => {
+    const query = trimmedSearch.toLowerCase()
+    if (!query) {
+      return activities
+    }
+    return activities.filter((a) => (a.title ?? '').toLowerCase().includes(query))
+  }, [activities, trimmedSearch])
+
+  const isFiltered = !!trimmedSearch
 
   const table = useReactTable({
-    data: activities,
+    data: filteredActivities,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -112,10 +126,25 @@ export function ActivitiesTable({ activities, total, uniqueBikeIds, bikes, onRow
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="gap-4">
         <CardTitle className="text-base font-semibold">
-          {activities.length} of {total} activit{total === 1 ? 'y' : 'ies'}
+          {isFiltered
+            ? `${filteredActivities.length} of ${activities.length} loaded activities match`
+            : `${activities.length} of ${total} activit${total === 1 ? 'y' : 'ies'}`}
         </CardTitle>
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            placeholder="Search title…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-48"
+          />
+          {isFiltered && (
+            <Button variant="ghost" size="sm" onClick={() => setSearch('')}>
+              Clear
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">

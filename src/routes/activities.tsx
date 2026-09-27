@@ -6,6 +6,7 @@ import { useBikes } from '../components/data/use-bikes'
 import { useActivities } from '../components/data/use-activities'
 import { ActivityDetailDrawer } from '../components/activity-detail-drawer'
 import { useBikeSelection } from '../lib/bike-selection-context'
+import { useDateFilteredActivities } from '../lib/use-date-filtered-activities'
 import { ActivitiesHeader } from '../components/activities-header'
 import { OdometerChart } from '../components/odometer-chart'
 import { ActivitiesTable } from '../components/activities-table'
@@ -120,9 +121,11 @@ export default function ActivitiesPage() {
 
   const uniqueBikeIds = useMemo(() => [...new Set(activities.map((a) => a.bikeId))], [activities])
 
+  const dateFilteredActivities = useDateFilteredActivities(activities)
+
   const filteredActivities = useMemo(
-    () => activities.filter((a) => enabledBikeIds.has(a.bikeId)),
-    [activities, enabledBikeIds]
+    () => dateFilteredActivities.filter((a) => enabledBikeIds.has(a.bikeId)),
+    [dateFilteredActivities, enabledBikeIds]
   )
 
   const bikeName = useCallback(
@@ -139,8 +142,8 @@ export default function ActivitiesPage() {
   )
 
   const chartData = useMemo(
-    () => buildChartData(activities, enabledBikeIds),
-    [activities, enabledBikeIds]
+    () => buildChartData(dateFilteredActivities, enabledBikeIds),
+    [dateFilteredActivities, enabledBikeIds]
   )
 
   const selectedActivity = useMemo(
@@ -222,7 +225,9 @@ export default function ActivitiesPage() {
         )}
       </div>
 
-      {isAuthenticated && <ActivityDetailDrawer summary={selectedActivity} onClose={closeActivity} />}
+      {isAuthenticated && (
+        <ActivityDetailDrawer summary={selectedActivity} onClose={closeActivity} />
+      )}
     </>
   )
 }

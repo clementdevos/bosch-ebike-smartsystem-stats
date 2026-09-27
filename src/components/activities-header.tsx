@@ -2,10 +2,12 @@ import { RefreshCw } from 'lucide-react'
 import { Button } from './ui/button'
 import { badgeVariants } from './ui/badge'
 import { useBikeSelection } from '../lib/bike-selection-context'
+import { DateRangePicker } from './date-range-picker'
 
 const BIKE_COLORS = ['#2563eb', '#16a34a', '#dc2626', '#9333ea', '#ea580c']
 
 interface Props {
+  title?: string
   uniqueBikeIds: string[]
   bikeName: (id: string) => string
   initialized: boolean
@@ -20,6 +22,7 @@ interface Props {
 }
 
 export function ActivitiesHeader({
+  title = 'Activities',
   uniqueBikeIds,
   bikeName,
   initialized,
@@ -36,7 +39,7 @@ export function ActivitiesHeader({
 
   return (
     <div className="flex flex-wrap items-center gap-6">
-      <h1 className="text-3xl font-bold">Activities</h1>
+      <h1 className="text-3xl font-bold">{title}</h1>
 
       {uniqueBikeIds.length > 1 && (
         <div className="flex flex-wrap gap-2">
@@ -93,6 +96,7 @@ export function ActivitiesHeader({
             {loadingMore ? 'Loading…' : `Load more (${total! - loadedCount} remaining)`}
           </Button>
         )}
+        <DateRangePicker />
       </div>
     </div>
   )
