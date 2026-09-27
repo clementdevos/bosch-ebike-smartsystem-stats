@@ -218,7 +218,11 @@ function StatsPage() {
         {!initialized ? (
           <StatsSkeleton />
         ) : filteredActivities.length === 0 ? (
-          <p className="text-gray-500">No activities loaded yet.</p>
+          <p className="text-gray-500">
+            {activities.length === 0
+              ? 'No activities loaded yet.'
+              : 'No activities match this range.'}
+          </p>
         ) : (
           <>
             {dateSpan && (

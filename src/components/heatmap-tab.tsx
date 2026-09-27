@@ -81,10 +81,13 @@ export function HeatmapTab() {
   )
 
   const [sampleSize, setSampleSize] = useState(50)
+  // Reset to a fresh default whenever the shared date range changes, rather
+  // than only ever shrinking — otherwise a narrow range followed by a wider
+  // one leaves the sample stuck at whatever it shrank to.
   useEffect(() => {
-    if (dateFilteredActivities.length > 0)
-      setSampleSize((prev) => Math.min(prev, dateFilteredActivities.length))
-  }, [dateFilteredActivities.length])
+    setSampleSize(Math.max(1, Math.min(50, dateFilteredActivities.length || 1)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [range])
 
   const [resolution, setResolution] = useState(DEFAULT_RES)
 

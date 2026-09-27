@@ -1,20 +1,31 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
-import { type DateRange, ALL_TIME } from './date-range'
+import { type DateRange, type PresetKey, ALL_TIME } from './date-range'
 
 interface DateRangeContextValue {
   range: DateRange
-  setRange: (range: DateRange) => void
+  presetKey: PresetKey | null
+  setRange: (range: DateRange, presetKey?: PresetKey | null) => void
   clearRange: () => void
 }
 
 const DateRangeContext = createContext<DateRangeContextValue | null>(null)
 
 export function DateRangeProvider({ children }: { children: ReactNode }) {
-  const [range, setRange] = useState<DateRange>(ALL_TIME)
-  const clearRange = useCallback(() => setRange(ALL_TIME), [])
+  const [range, setRangeState] = useState<DateRange>(ALL_TIME)
+  const [presetKey, setPresetKey] = useState<PresetKey | null>(null)
+
+  const setRange = useCallback((next: DateRange, preset: PresetKey | null = null) => {
+    setRangeState(next)
+    setPresetKey(preset)
+  }, [])
+
+  const clearRange = useCallback(() => {
+    setRangeState(ALL_TIME)
+    setPresetKey(null)
+  }, [])
 
   return (
-    <DateRangeContext.Provider value={{ range, setRange, clearRange }}>
+    <DateRangeContext.Provider value={{ range, presetKey, setRange, clearRange }}>
       {children}
     </DateRangeContext.Provider>
   )
