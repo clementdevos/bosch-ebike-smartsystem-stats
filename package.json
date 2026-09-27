@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite dev --port 8080",
     "build": "vite build",
+    "start": "node --env-file=.env.local .output/server/index.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint src",
