@@ -194,8 +194,8 @@ export function DateRangePicker() {
       </Button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-2 flex w-[calc(100vw-2rem)] max-w-[540px] flex-col gap-4 rounded-lg border bg-white p-4 shadow-lg sm:w-[540px] sm:flex-row dark:bg-slate-900">
-          <div className="flex shrink-0 flex-col gap-0.5 border-b pb-3 sm:w-36 sm:border-r sm:border-b-0 sm:pr-3 sm:pb-0">
+        <div className="fixed inset-x-4 top-20 z-20 flex max-h-[calc(100vh-6rem)] flex-col gap-4 overflow-y-auto rounded-lg border bg-white p-4 shadow-lg min-[500px]:absolute min-[500px]:inset-x-auto min-[500px]:top-auto min-[500px]:right-0 min-[500px]:mt-2 min-[500px]:max-h-none min-[500px]:w-[540px] min-[500px]:flex-row min-[500px]:overflow-visible dark:bg-slate-900">
+          <div className="flex shrink-0 flex-col gap-0.5 border-b pb-3 min-[500px]:w-36 min-[500px]:border-r min-[500px]:border-b-0 min-[500px]:pr-3 min-[500px]:pb-0">
             {PRESETS.map((p) => (
               <button
                 key={p.key}
@@ -235,7 +235,7 @@ export function DateRangePicker() {
               <span className="flex-1 text-center text-sm font-medium">
                 {monthLabel(baseMonth.year, baseMonth.month)}
               </span>
-              <span className="hidden flex-1 text-center text-sm font-medium sm:block">
+              <span className="hidden flex-1 text-center text-sm font-medium min-[500px]:block">
                 {monthLabel(next.year, next.month)}
               </span>
               <Button
@@ -261,7 +261,7 @@ export function DateRangePicker() {
                 draftRange={draftRange}
                 pendingFrom={pendingFrom}
                 onDayClick={handleDayClick}
-                className="hidden sm:block"
+                className="hidden min-[500px]:block"
               />
             </div>
 
