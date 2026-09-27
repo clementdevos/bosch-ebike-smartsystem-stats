@@ -20,6 +20,14 @@ function fmtDuration(seconds: number) {
   return `${h}h ${m}m`
 }
 
+function fmtDate(when: string | number) {
+  return new Date(when).toLocaleDateString(undefined, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
 function StatsSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -105,6 +113,11 @@ function StatsPage() {
 
   const totals = useMemo(() => computeTotals(filteredActivities), [filteredActivities])
   const records = useMemo(() => computeRecords(filteredActivities), [filteredActivities])
+  const dateSpan = useMemo(() => {
+    if (filteredActivities.length === 0) return null
+    const times = filteredActivities.map((a) => new Date(a.startTime).getTime())
+    return { from: Math.min(...times), to: Math.max(...times) }
+  }, [filteredActivities])
 
   if (authLoading) {
     return (
@@ -175,6 +188,13 @@ function StatsPage() {
         <p className="text-gray-500">No activities loaded yet.</p>
       ) : (
         <>
+          {dateSpan && (
+            <p className="text-sm text-gray-500">
+              {totals.count} activit{totals.count === 1 ? 'y' : 'ies'} from{' '}
+              {fmtDate(dateSpan.from)} to {fmtDate(dateSpan.to)}
+            </p>
+          )}
+
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <StatTile label="Total distance" value={`${(totals.distance / 1000).toFixed(0)} km`} />
             <StatTile label="Total time" value={fmtDuration(totals.duration)} />
