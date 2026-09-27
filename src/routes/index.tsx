@@ -13,6 +13,7 @@ import {
   CardFooter,
 } from '../components/ui/card'
 import { Button } from '../components/ui/button'
+import { Skeleton } from '../components/ui/skeleton'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -84,6 +85,14 @@ function Home() {
         </>
       )}
 
+      {isAuthenticated && !bikes && !error && (
+        <div className="space-y-4">
+          {Array.from({ length: 2 }, (_, i) => (
+            <BikeCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
+
       {!isAuthenticated && (
         <div className="space-y-3">
           <p className="text-gray-500">Sign in to view your eBike data.</p>
@@ -117,6 +126,24 @@ function Home() {
         </div>
       )}
     </div>
+  )
+}
+
+function BikeCardSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-4 w-32" />
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+          {Array.from({ length: 6 }, (_, i) => (
+            <Skeleton key={i} className="h-4 w-full" />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 

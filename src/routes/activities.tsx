@@ -10,6 +10,8 @@ import { ActivitiesHeader } from '../components/activities-header'
 import { OdometerChart } from '../components/odometer-chart'
 import { ActivitiesTable } from '../components/activities-table'
 import { Button } from '../components/ui/button'
+import { Card, CardContent, CardHeader } from '../components/ui/card'
+import { Skeleton } from '../components/ui/skeleton'
 
 export const Route = createFileRoute('/activities')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -24,6 +26,31 @@ function fmtShortDate(iso: string) {
     month: 'short',
     year: '2-digit',
   })
+}
+
+function ActivitiesSkeleton() {
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-5 w-40" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[260px] w-full" />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-5 w-32" />
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {Array.from({ length: 8 }, (_, i) => (
+            <Skeleton key={i} className="h-8 w-full" />
+          ))}
+        </CardContent>
+      </Card>
+    </>
+  )
 }
 
 type ChartEntry = { date: string } & Record<string, string | number>
@@ -47,7 +74,7 @@ function buildChartData(activities: ActivitySummary[], enabledIds: Set<string>):
 }
 
 export default function ActivitiesPage() {
-  const { isAuthenticated, login } = useAuth()
+  const { isAuthenticated, login, isLoading: authLoading } = useAuth()
   const { activityId } = Route.useSearch()
   const navigate = useNavigate({ from: '/activities' })
   const { enabledBikeIds, enableAll } = useBikeSelection()
@@ -132,6 +159,15 @@ export default function ActivitiesPage() {
     navigate({ search: { activityId: undefined } })
   }, [navigate])
 
+  if (authLoading) {
+    return (
+      <div className="mx-auto max-w-5xl space-y-8 p-8">
+        <Skeleton className="h-9 w-40" />
+        <ActivitiesSkeleton />
+      </div>
+    )
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center gap-4 p-8">
@@ -162,24 +198,27 @@ export default function ActivitiesPage() {
           <div className="rounded-md border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
         )}
 
-        <OdometerChart
-          chartData={chartData}
-          enabledIds={enabledIds}
-          uniqueBikeIds={uniqueBikeIds}
-          bikeName={bikeName}
-          hasMore={hasMore}
-          loadedCount={activities.length}
-          total={total}
-        />
-
-        {initialized && (
-          <ActivitiesTable
-            activities={filteredActivities}
-            total={total}
-            uniqueBikeIds={uniqueBikeIds}
-            bikes={bikes}
-            onRowClick={openActivity}
-          />
+        {initialized ? (
+          <>
+            <OdometerChart
+              chartData={chartData}
+              enabledIds={enabledIds}
+              uniqueBikeIds={uniqueBikeIds}
+              bikeName={bikeName}
+              hasMore={hasMore}
+              loadedCount={activities.length}
+              total={total}
+            />
+            <ActivitiesTable
+              activities={filteredActivities}
+              total={total}
+              uniqueBikeIds={uniqueBikeIds}
+              bikes={bikes}
+              onRowClick={openActivity}
+            />
+          </>
+        ) : (
+          !error && <ActivitiesSkeleton />
         )}
       </div>
 
